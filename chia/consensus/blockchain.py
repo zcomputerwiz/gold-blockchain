@@ -3,6 +3,7 @@ import dataclasses
 import logging
 import multiprocessing
 import pathlib
+import time
 from concurrent.futures.process import ProcessPoolExecutor
 from enum import Enum
 from typing import Dict, List, Optional, Set, Tuple, Union
@@ -101,6 +102,7 @@ class Blockchain(BlockchainInterface):
         self = Blockchain()
 #        self.lock = asyncio.Lock()  # External lock handled by full node
         self.lock = InstrumentedLock("blockchain", root_path)
+        self.compact_proof_lock= InstrumentedLock("compact proofs", root_path)
         cpu_count = multiprocessing.cpu_count()
         if cpu_count > 61:
             cpu_count = 61  # Windows Server 2016 has an issue https://bugs.python.org/issue26903
@@ -219,6 +221,7 @@ class Blockchain(BlockchainInterface):
                 npc_result = None
                 header_block = get_block_header(block, [], [])
 
+            start = time.time()
             required_iters, error = validate_finished_header_block(
                 self.constants,
                 self,
@@ -235,6 +238,7 @@ class Blockchain(BlockchainInterface):
             required_iters = pre_validation_result.required_iters
             assert pre_validation_result.error is None
         assert required_iters is not None
+        start = time.time()
         error_code, _ = await validate_block_body(
             self.constants,
             self,
@@ -247,6 +251,7 @@ class Blockchain(BlockchainInterface):
             fork_point_with_peak,
             self.get_block_generator,
         )
+        log.info(f"Block validation, validate block body {time.time() - start} sec")
         if error_code is not None:
             return ReceiveBlockResult.INVALID_BLOCK, error_code, None
 
@@ -257,6 +262,7 @@ class Blockchain(BlockchainInterface):
             block,
             None,
         )
+        start = time.time()
         # Always add the block to the database
         async with self.block_store.db_wrapper.lock:
             try:
@@ -283,6 +289,7 @@ class Blockchain(BlockchainInterface):
                 self.block_store.rollback_cache_block(header_hash)
                 await self.block_store.db_wrapper.rollback_transaction()
                 raise
+        log.info(f"Block validation, add to database {time.time() - start} sec")
         if fork_height is not None:
             return ReceiveBlockResult.NEW_PEAK, None, fork_height
         else:

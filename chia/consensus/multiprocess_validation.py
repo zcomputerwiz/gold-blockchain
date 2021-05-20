@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor
 from dataclasses import dataclass
@@ -80,7 +81,7 @@ def batch_pre_validate_blocks(
                         block_generator, min(constants.MAX_BLOCK_COST_CLVM, block.transactions_info.cost), True
                     )
                     removals, tx_additions = tx_removals_and_additions(npc_result.npc_list)
-
+                start = time.time()
                 header_block = get_block_header(block, tx_additions, removals)
                 required_iters, error = validate_finished_header_block(
                     constants,
@@ -90,6 +91,7 @@ def batch_pre_validate_blocks(
                     expected_difficulty[i],
                     expected_sub_slot_iters[i],
                 )
+                log.info(f"Block validation, validate_finished_header_block took {time.time() - start}")
                 error_int: Optional[uint16] = None
                 if error is not None:
                     error_int = uint16(error.code.value)
@@ -102,6 +104,7 @@ def batch_pre_validate_blocks(
     elif header_blocks_pickled is not None:
         for i in range(len(header_blocks_pickled)):
             try:
+                start= time.time()
                 header_block = HeaderBlock.from_bytes(header_blocks_pickled[i])
                 required_iters, error = validate_finished_header_block(
                     constants,
@@ -115,6 +118,7 @@ def batch_pre_validate_blocks(
                 if error is not None:
                     error_int = uint16(error.code.value)
                 results.append(PreValidationResult(error_int, required_iters, None))
+                log.info(f"Block validation, validate_finished_header_block took {time.time() - start}")
             except Exception:
                 error_stack = traceback.format_exc()
                 log.error(f"Exception: {error_stack}")
@@ -148,6 +152,7 @@ async def pre_validate_blocks_multiprocessing(
         npc_results
         get_block_generator
     """
+    start = time.time()
     prev_b: Optional[BlockRecord] = None
     # Collects all the recent blocks (up to the previous sub-epoch)
     recent_blocks: Dict[bytes32, BlockRecord] = {}
@@ -244,6 +249,7 @@ async def pre_validate_blocks_multiprocessing(
         npc_results_pickled[k] = bytes(v)
     futures = []
     # Pool of workers to validate blocks concurrently
+    log.info(f"Block validation, block pre process for {len(blocks)} blocks took {time.time() - start}")
     for i in range(0, len(blocks), batch_size):
         end_i = min(i + batch_size, len(blocks))
         blocks_to_validate = blocks[i:end_i]
@@ -298,6 +304,7 @@ async def pre_validate_blocks_multiprocessing(
                 [diff_ssis[j][1] for j in range(i, end_i)],
             )
         )
+    log.info(f"Block validation, creating tasks for {len(blocks)} blocks took {time.time() - start}")
     # Collect all results into one flat list
     return [
         PreValidationResult.from_bytes(result)

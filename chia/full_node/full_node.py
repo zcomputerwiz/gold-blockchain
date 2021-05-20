@@ -1156,6 +1156,7 @@ class FullNode:
             pre_validation_results: Optional[
                 List[PreValidationResult]
             ] = await self.blockchain.pre_validate_blocks_multiprocessing([block], npc_results)
+            self.log.info(f"Block validation multiproc pre validation {time.time() - validation_start} sec")
             if pre_validation_results is None:
                 raise ValueError(f"Failed to validate block {header_hash} height {block.height}")
             if pre_validation_results[0].error is not None:
@@ -1611,8 +1612,10 @@ class FullNode:
                 self.mempool_manager.remove_seen(spend_name)
                 raise e
             async with self.blockchain.lock:
+                start = time.time()
                 if self.mempool_manager.get_spendbundle(spend_name) is not None:
                     self.mempool_manager.remove_seen(spend_name)
+                    self.log.info(f"time to process tx {time.time()-start} sec {spend_name}")
                     return MempoolInclusionStatus.FAILED, Err.ALREADY_INCLUDING_TRANSACTION
                 cost, status, error = await self.mempool_manager.add_spendbundle(transaction, cost_result, spend_name)
                 if status == MempoolInclusionStatus.SUCCESS:
@@ -1633,15 +1636,20 @@ class FullNode:
                         fees,
                     )
                     msg = make_msg(ProtocolMessageTypes.new_transaction, new_tx)
+                    remove_seen = time.time()
                     if peer is None:
                         await self.server.send_to_all([msg], NodeType.FULL_NODE)
                     else:
                         await self.server.send_to_all_except([msg], NodeType.FULL_NODE, peer.peer_node_id)
+                    self.log.info(f"time to send tx {time.time()-remove_seen} sec {spend_name}")
                 else:
+                    remove_seen = time.time()
                     self.mempool_manager.remove_seen(spend_name)
+                    self.log.info(f"time to remove seen tx {time.time()-remove_seen} sec")
                     self.log.debug(
                         f"Wasn't able to add transaction with id {spend_name}, " f"status {status} error: {error}"
                     )
+        self.log.info(f"time to process tx {time.time()-start} sec {spend_name}")
         return status, error
 
     async def _needs_compact_proof(
@@ -1802,10 +1810,13 @@ class FullNode:
             response = await peer.request_compact_vdf(peer_request, timeout=10)
             if response is not None and isinstance(response, full_node_protocol.RespondCompactVDF):
                 await self.respond_compact_vdf(response, peer)
+            else:
+                self.log.info(f"new_compact_vdf timeout from peer")
 
     async def request_compact_vdf(self, request: full_node_protocol.RequestCompactVDF, peer: ws.WSChiaConnection):
+        start = time.time()
         header_block = await self.blockchain.get_header_block_by_height(
-            request.height, request.header_hash, tx_filter=False
+            request.height, request.header_hash, tx_filter=True
         )
         if header_block is None:
             return None
@@ -1846,6 +1857,7 @@ class FullNode:
         )
         msg = make_msg(ProtocolMessageTypes.respond_compact_vdf, compact_vdf)
         await peer.send_message(msg)
+        self.log.info(f"{peer} requested compact vdf took {time.time() - start}.")
 
     async def respond_compact_vdf(self, request: full_node_protocol.RespondCompactVDF, peer: ws.WSChiaConnection):
         field_vdf = CompressibleVDFField(int(request.field_vdf))
