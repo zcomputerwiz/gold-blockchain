@@ -265,6 +265,8 @@ class Blockchain(BlockchainInterface):
         start = time.time()
         # Always add the block to the database
         async with self.block_store.db_wrapper.lock:
+            log.info(f"Block validation, time for lock {time.time() - start} sec")
+            start = time.time()
             try:
                 # Perform the DB operations to update the state, and rollback if something goes wrong
                 await self.block_store.db_wrapper.begin_transaction()
