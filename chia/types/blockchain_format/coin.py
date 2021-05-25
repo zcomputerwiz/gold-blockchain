@@ -15,6 +15,7 @@ class Coin(Streamable):
     This structure is used in the body for the reward and fees genesis coins.
     """
 
+    # parent coin ID
     parent_coin_info: bytes32
     puzzle_hash: bytes32
     amount: uint64
@@ -29,6 +30,9 @@ class Coin(Streamable):
         # these hashes easily.
         return std_hash(self.parent_coin_info + self.puzzle_hash + int_to_bytes(self.amount))
 
+    # this coin name/coin ID is unique (within a specific fork of the chain)
+    # because consensus rules prevent the creation of coins with the same puzzle
+    # hash, amount and parent coin.
     def name(self) -> bytes32:
         return self.get_hash()
 
