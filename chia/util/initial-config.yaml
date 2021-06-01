@@ -97,8 +97,11 @@ network_overrides: &network_overrides
     testnet7:
       address_prefix: "txch"
       default_full_node_port: 58444
+    testnet8:
+      address_prefix: "txch"
+      default_full_node_port: 58444
 
-selected_network: &selected_network "mainnet"
+selected_network: &selected_network "testnet8"
 ALERTS_URL: https://download.chia.net/notify/mainnet_alert.txt
 CHIA_ALERTS_PUBKEY: 89b7fd87cb56e926ecefb879a29aae308be01f31980569f6a75a69d2a9a69daefd71fb778d865f7c50d6c967e3025937
 
@@ -174,7 +177,7 @@ farmer:
   # The farmer will attempt to connect to this full node and harvester
   full_node_peer:
     host: *self_hostname
-    port: 8444
+    port: 58445
   harvester_peer:
     host: *self_hostname
     port: 8448
@@ -223,7 +226,7 @@ timelord:
       - 150000
   full_node_peer:
       host: *self_hostname
-      port: 8444
+      port: 58445
   # Maximum number of seconds allowed for a client to reconnect to the server.
   max_connection_time: 60
   # The ip and port where the TCP clients will connect.
@@ -258,7 +261,7 @@ timelord:
 
 full_node:
   # The full node server (if run) will run on this port
-  port: 8444
+  port: 58445
 
   # Run multiple nodes with different databases by changing the database_path
   database_path: db/blockchain_v1_CHALLENGE.sqlite
@@ -313,7 +316,7 @@ full_node:
   # List of trusted DNS seeders to bootstrap from.
   # If you modify this, please change the hardcode as well from FullNode.set_server()
   dns_servers:
-    - "dns-introducer.chia.net"
+    - "dns-introducer-testnet8.chia.net" # Testnet DNS introducers not up, but this would be the host to check
   farmer_peer:
       host: *self_hostname
       port: 8447
@@ -321,8 +324,8 @@ full_node:
       host: *self_hostname
       port: 8446
   introducer_peer:
-      host: introducer.chia.net  # Chia AWS introducer IPv4/IPv6
-      port: 8444
+      host: testnet8-introducer-a.chia.net
+      port: 58445
   wallet_peer:
     host: *self_hostname
     port: 8449
@@ -388,7 +391,7 @@ wallet:
 
   full_node_peer:
     host: *self_hostname
-    port: 8444
+    port: 58445
 
   testing: False
   database_path: wallet/db/blockchain_wallet_v1_CHALLENGE_KEY.sqlite
@@ -405,8 +408,8 @@ wallet:
   recent_peer_threshold: 6000
 
   introducer_peer:
-    host: introducer.chia.net # Chia AWS introducer IPv4/IPv6
-    port: 8444
+    host: testnet8-introducer-a.chia.net # Chia AWS introducer IPv4/IPv6
+    port: 58445
 
   ssl:
     private_crt:  "config/ssl/wallet/private_wallet.crt"
