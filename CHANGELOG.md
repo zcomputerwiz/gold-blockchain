@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does not yet adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 for setuptools_scm/PEP 440 reasons.
 
+<<<<<<< HEAD
 ## 1.2.0 Chia blockchain 2021-07-07
 
 ### Added
@@ -75,6 +76,9 @@ OG plots made before this release can continue to be farmed side by side with th
 - If you resync your wallet, transactions made with your plot NFTs will show incorrectly in the GUI. The internal accounting, and total balance displayed is correct.
 
 ### 1.1.7 Chia Blockchain 2021-06-05
+=======
+## 1.1.6 Chia Blockchain 2021-06-05
+>>>>>>> 06316e8f (changelog)
 
 ### Fixed
 
