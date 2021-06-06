@@ -7,6 +7,7 @@ and this project does not yet adhere to [Semantic Versioning](https://semver.org
 for setuptools_scm/PEP 440 reasons.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## 1.2.0 Chia blockchain 2021-07-07
 
 ### Added
@@ -79,6 +80,9 @@ OG plots made before this release can continue to be farmed side by side with th
 =======
 ## 1.1.6 Chia Blockchain 2021-06-05
 >>>>>>> 06316e8f (changelog)
+=======
+## 1.1.7 Chia Blockchain 2021-06-05
+>>>>>>> b075e5bb (Update CHANGELOG.md)
 
 ### Fixed
 
