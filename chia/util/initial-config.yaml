@@ -316,7 +316,7 @@ full_node:
   # List of trusted DNS seeders to bootstrap from.
   # If you modify this, please change the hardcode as well from FullNode.set_server()
   dns_servers:
-    - "dns-introducer-testnet8.chia.net" # Testnet DNS introducers not up, but this would be the host to check
+    - "dns-introducer-testnet8-testnet8.chia.net"
   farmer_peer:
       host: *self_hostname
       port: 8447
@@ -324,7 +324,7 @@ full_node:
       host: *self_hostname
       port: 8446
   introducer_peer:
-      host: testnet8-introducer-a.chia.net
+      host: testnet8-testnet8-introducer-a.chia.net
       port: 58445
   wallet_peer:
     host: *self_hostname
@@ -408,7 +408,7 @@ wallet:
   recent_peer_threshold: 6000
 
   introducer_peer:
-    host: testnet8-introducer-a.chia.net # Chia AWS introducer IPv4/IPv6
+    host: testnet8-testnet8-introducer-a.chia.net # Chia AWS introducer IPv4/IPv6
     port: 58445
 
   ssl:
