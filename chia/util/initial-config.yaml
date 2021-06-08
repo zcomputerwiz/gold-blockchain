@@ -324,7 +324,7 @@ full_node:
       host: *self_hostname
       port: 8446
   introducer_peer:
-      host: testnet8-testnet8-introducer-a.chia.net
+      host: testnet8-testnet8-introducer-0.chia.net
       port: 58445
   wallet_peer:
     host: *self_hostname
@@ -408,7 +408,7 @@ wallet:
   recent_peer_threshold: 6000
 
   introducer_peer:
-    host: testnet8-testnet8-introducer-a.chia.net # Chia AWS introducer IPv4/IPv6
+    host: testnet8-testnet8-introducer-0.chia.net # Chia AWS introducer IPv4/IPv6
     port: 58445
 
   ssl:
