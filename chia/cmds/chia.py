@@ -14,6 +14,7 @@ from chia.cmds.start import start_cmd
 from chia.cmds.stop import stop_cmd
 from chia.cmds.wallet import wallet_cmd
 from chia.util.default_root import DEFAULT_ROOT_PATH
+from chia.util.keychain import set_keyring_root_path
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -47,6 +48,8 @@ def cli(ctx: click.Context, root_path: str, **kwargs) -> None:
 
     ctx.ensure_object(dict)
     ctx.obj["root_path"] = Path(root_path)
+
+    set_keyring_root_path(ctx.obj["root_path"])
 
     password_file = kwargs.get("password_file")
     if password_file:
