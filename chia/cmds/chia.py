@@ -13,8 +13,8 @@ from chia.cmds.show import show_cmd
 from chia.cmds.start import start_cmd
 from chia.cmds.stop import stop_cmd
 from chia.cmds.wallet import wallet_cmd
-from chia.util.default_root import DEFAULT_ROOT_PATH
-from chia.util.keychain import set_keyring_root_path
+from chia.util.default_root import DEFAULT_KEYS_ROOT_PATH, DEFAULT_ROOT_PATH
+from chia.util.keychain import set_keys_root_path
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -41,6 +41,9 @@ def monkey_patch_click() -> None:
     context_settings=CONTEXT_SETTINGS,
 )
 @click.option("--root-path", default=DEFAULT_ROOT_PATH, help="Config file root", type=click.Path(), show_default=True)
+@click.option(
+    "--keys-root-path", default=DEFAULT_KEYS_ROOT_PATH, help="Keyring file root", type=click.Path(), show_default=True
+)
 @click.option("--password-file", type=click.File("r"), help="File or descriptor to read the keyring password from")
 @click.pass_context
 def cli(ctx: click.Context, root_path: str, **kwargs) -> None:
@@ -49,7 +52,9 @@ def cli(ctx: click.Context, root_path: str, **kwargs) -> None:
     ctx.ensure_object(dict)
     ctx.obj["root_path"] = Path(root_path)
 
-    set_keyring_root_path(ctx.obj["root_path"])
+    keys_root_path = kwargs.get("keys_root_path")
+    if keys_root_path:
+        set_keys_root_path(Path(keys_root_path))
 
     password_file = kwargs.get("password_file")
     if password_file:
