@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import time
+import traceback
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -186,8 +187,8 @@ class Farmer:
                                 self.pool_state[p2_singleton_puzzle_hash]["pool_info"] = json.loads(await resp.text())
                             else:
                                 self.log.error(f"Error fetching pool info from {pool_config.pool_url}, {resp.status}")
-            except Exception as e:
-                self.log.error(f"Exception fetching pool info from {pool_config.pool_url}, {e}")
+            except Exception:
+                self.log.error(f"Exception fetching pool info from {pool_config.pool_url} {traceback.format_exc()}")
 
     def get_public_keys(self):
         return [child_sk.get_g1() for child_sk in self._private_keys]
