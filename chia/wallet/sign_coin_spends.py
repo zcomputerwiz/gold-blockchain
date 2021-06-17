@@ -3,13 +3,13 @@ from typing import Callable, List, Optional
 import blspy
 from blspy import AugSchemeMPL, PrivateKey
 
-from chia.types.coin_solution import CoinSolution
+from chia.types.coin_spend import CoinSpend
 from chia.types.spend_bundle import SpendBundle
 from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
 
 
-async def sign_coin_solutions(
-    coin_solutions: List[CoinSolution],
+async def sign_coin_spends(
+    coin_spends: List[CoinSpend],
     secret_key_for_public_key_f: Callable[[blspy.G1Element], Optional[PrivateKey]],
     additional_data: bytes,
     max_cost: int,
@@ -17,10 +17,10 @@ async def sign_coin_solutions(
     signatures: List[blspy.G2Element] = []
     pk_list: List[blspy.G1Element] = []
     msg_list: List[bytes] = []
-    for coin_solution in coin_solutions:
+    for coin_spend in coin_spends:
         # Get AGG_SIG conditions
         err, conditions_dict, cost = conditions_dict_for_solution(
-            coin_solution.puzzle_reveal, coin_solution.solution, max_cost
+            coin_spend.puzzle_reveal, coin_spend.solution, max_cost
         )
         if err or conditions_dict is None:
             error_msg = f"Sign transaction failed, con:{conditions_dict}, error: {err}"
@@ -28,7 +28,7 @@ async def sign_coin_solutions(
 
         # Create signature
         for pk, msg in pkm_pairs_for_conditions_dict(
-            conditions_dict, bytes(coin_solution.coin.name()), additional_data
+            conditions_dict, bytes(coin_spend.coin.name()), additional_data
         ):
             pk_list.append(pk)
             msg_list.append(msg)
@@ -44,4 +44,4 @@ async def sign_coin_solutions(
     # Aggregate signatures
     aggsig = AugSchemeMPL.aggregate(signatures)
     assert AugSchemeMPL.aggregate_verify(pk_list, msg_list, aggsig)
-    return SpendBundle(coin_solutions, aggsig)
+    return SpendBundle(coin_spends, aggsig)

@@ -48,24 +48,24 @@ class CoinStore:
         puzzle_announcements: Set[bytes32] = set()
 
         conditions_dicts = []
-        for coin_solution in spend_bundle.coin_solutions:
+        for coin_spend in spend_bundle.coin_spends:
             err, conditions_dict, cost = conditions_dict_for_solution(
-                coin_solution.puzzle_reveal, coin_solution.solution, max_cost
+                coin_spend.puzzle_reveal, coin_spend.solution, max_cost
             )
             if conditions_dict is None:
                 raise BadSpendBundleError(f"clvm validation failure {err}")
             conditions_dicts.append(conditions_dict)
             coin_announcements.update(
-                coin_announcement_names_for_conditions_dict(conditions_dict, coin_solution.coin.name())
+                coin_announcement_names_for_conditions_dict(conditions_dict, coin_spend.coin.name())
             )
             puzzle_announcements.update(
-                puzzle_announcement_names_for_conditions_dict(conditions_dict, coin_solution.coin.puzzle_hash)
+                puzzle_announcement_names_for_conditions_dict(conditions_dict, coin_spend.coin.puzzle_hash)
             )
 
-        for coin_solution, conditions_dict in zip(spend_bundle.coin_solutions, conditions_dicts):
+        for coin_spend, conditions_dict in zip(spend_bundle.coin_spends, conditions_dicts):
             prev_transaction_block_height = now.height
             timestamp = now.seconds
-            coin_record = self._db[coin_solution.coin.name()]
+            coin_record = self._db[coin_spend.coin.name()]
             err = mempool_check_conditions_dict(
                 coin_record,
                 coin_announcements,

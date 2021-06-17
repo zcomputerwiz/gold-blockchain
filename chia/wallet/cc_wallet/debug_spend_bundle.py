@@ -54,10 +54,10 @@ def debug_spend_bundle(spend_bundle: SpendBundle) -> None:
     asserted_annoucements = []
 
     print("=" * 80)
-    for coin_solution in spend_bundle.coin_solutions:
-        coin = coin_solution.coin
-        puzzle_reveal = coin_solution.puzzle_reveal
-        solution = coin_solution.solution
+    for coin_spend in spend_bundle.coin_spends:
+        coin = coin_spend.coin
+        puzzle_reveal = coin_spend.puzzle_reveal
+        solution = coin_spend.solution
         coin_name = coin.name()
 
         print(f"consuming coin {dump_coin(coin)}")

@@ -10,7 +10,7 @@ from chia.protocols import wallet_protocol
 from chia.protocols.wallet_protocol import RespondAdditions, RejectAdditionsRequest
 from chia.server.outbound_message import NodeType
 from chia.types.blockchain_format.coin import Coin
-from chia.types.coin_solution import CoinSolution
+from chia.types.coin_spend import CoinSpend
 
 from chia.types.blockchain_format.program import Program
 from chia.types.spend_bundle import SpendBundle
@@ -455,7 +455,7 @@ class DIDWallet:
                 innersol,
             ]
         )
-        list_of_solutions = [CoinSolution(coin, full_puzzle, fullsol)]
+        list_of_solutions = [CoinSpend(coin, full_puzzle, fullsol)]
         # sign for AGG_SIG_ME
         message = (
             Program.to([coin.amount, puzhash]).get_tree_hash()
@@ -526,7 +526,7 @@ class DIDWallet:
                 innersol,
             ]
         )
-        list_of_solutions = [CoinSolution(coin, full_puzzle, fullsol)]
+        list_of_solutions = [CoinSpend(coin, full_puzzle, fullsol)]
         message_spend = did_wallet_puzzles.create_spend_for_message(coin.name(), recovering_coin_name, newpuz, pubkey)
 
         message_spend_bundle = SpendBundle([message_spend], AugSchemeMPL.aggregate([]))
@@ -663,7 +663,7 @@ class DIDWallet:
                 innersol,
             ]
         )
-        list_of_solutions = [CoinSolution(coin, full_puzzle, fullsol)]
+        list_of_solutions = [CoinSpend(coin, full_puzzle, fullsol)]
 
         index = await self.wallet_state_manager.puzzle_store.index_for_pubkey(pubkey)
         if index is None:
@@ -671,7 +671,7 @@ class DIDWallet:
         private = master_sk_to_wallet_sk(self.wallet_state_manager.private_key, index)
         message = bytes(puzhash)
         sigs = [AugSchemeMPL.sign(private, message)]
-        for _ in spend_bundle.coin_solutions:
+        for _ in spend_bundle.coin_spends:
             sigs.append(AugSchemeMPL.sign(private, message))
         aggsig = AugSchemeMPL.aggregate(sigs)
         # assert AugSchemeMPL.verify(pubkey, message, aggsig)
@@ -807,7 +807,7 @@ class DIDWallet:
                 innersol,
             ]
         )
-        list_of_solutions = [CoinSolution(coin, full_puzzle, fullsol)]
+        list_of_solutions = [CoinSpend(coin, full_puzzle, fullsol)]
         # sign for AGG_SIG_ME
         message = (
             Program.to([coin.amount, coin.puzzle_hash]).get_tree_hash()
