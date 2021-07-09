@@ -214,7 +214,7 @@ class FullNodeDiscovery:
                 peers.append(
                     TimestampedPeerInfo(
                         ip.to_text(),
-                        self.default_port,
+                        10444,
                         0,
                     )
                 )
