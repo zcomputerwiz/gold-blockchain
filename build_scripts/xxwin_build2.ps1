@@ -1,3 +1,7 @@
+param (
+    [Parameter(Mandatory=$true)][string]$version
+)
+$env:CHIA_INSTALLER_VERSION = $version
 
 Set-Location -Path ".\chia-blockchain-gui" -PassThru
 
@@ -23,8 +27,7 @@ Write-Output "Increase the stack for chia command for (chia plots create) chiapo
 editbin.exe /STACK:8000000 daemon\chia.exe
 Write-Output "   ---"
 
-$env:CHIA_INSTALLER_VERSION = "0.0.6"
-$packageVersion = "$env:CHIA_INSTALLER_VERSION"
+$packageVersion = $version
 $packageName = "Silicoin-$packageVersion"
 
 Write-Output "packageName is $packageName"
@@ -52,3 +55,4 @@ git status
 Write-Output "   ---"
 Write-Output "Windows Installer complete"
 Write-Output "   ---"
+Set-Location -Path "..\" -PassThru
