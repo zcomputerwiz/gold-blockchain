@@ -190,7 +190,7 @@ class WalletBlockchain(BlockchainInterface):
 
         if trusted is False and pre_validation_result is None:
             required_iters, error = validate_finished_header_block(
-                self.constants, self, block, False, difficulty, sub_slot_iters
+                self.constants, self, block, False, difficulty, sub_slot_iters, self.coin_store
             )
         elif trusted:
             unfinished_header_block = UnfinishedHeaderBlock(
@@ -204,7 +204,15 @@ class WalletBlockchain(BlockchainInterface):
             )
 
             required_iters, val_error = validate_unfinished_header_block(
-                self.constants, self, unfinished_header_block, False, difficulty, sub_slot_iters, False, True
+                self.constants,
+                self,
+                unfinished_header_block,
+                False,
+                difficulty,
+                sub_slot_iters,
+                self.coin_store,
+                False,
+                True,
             )
             error = ValidationError(Err(val_error)) if val_error is not None else None
         else:

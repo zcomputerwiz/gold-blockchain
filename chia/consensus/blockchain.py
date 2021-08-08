@@ -224,6 +224,7 @@ class Blockchain(BlockchainInterface):
                 False,
                 difficulty,
                 sub_slot_iters,
+                self.coin_store,
             )
 
             if error is not None:
@@ -509,6 +510,7 @@ class Blockchain(BlockchainInterface):
             False,
             difficulty,
             sub_slot_iters,
+            self.coin_store,
             skip_overflow_ss_validation,
         )
 
@@ -571,6 +573,7 @@ class Blockchain(BlockchainInterface):
             npc_results,
             self.get_block_generator,
             batch_size,
+            self.coin_store,
             wp_summaries,
         )
 

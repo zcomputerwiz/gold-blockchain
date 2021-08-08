@@ -3,7 +3,7 @@ import logging
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple, Union, Callable
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from chia.consensus.block_header_validation import validate_finished_header_block
 from chia.consensus.block_record import BlockRecord
@@ -14,6 +14,7 @@ from chia.consensus.difficulty_adjustment import get_next_sub_slot_iters_and_dif
 from chia.consensus.full_block_to_block_record import block_to_block_record
 from chia.consensus.get_block_challenge import get_block_challenge
 from chia.consensus.pot_iterations import calculate_iterations_quality, is_overflow_block
+from chia.full_node.coin_store import CoinStore
 from chia.full_node.mempool_check_conditions import get_name_puzzle_conditions
 from chia.types.blockchain_format.coin import Coin
 from chia.types.blockchain_format.sized_bytes import bytes32
@@ -24,7 +25,7 @@ from chia.types.header_block import HeaderBlock
 from chia.util.block_cache import BlockCache
 from chia.util.errors import Err
 from chia.util.generator_tools import get_block_header, tx_removals_and_additions
-from chia.util.ints import uint16, uint64, uint32
+from chia.util.ints import uint16, uint32, uint64
 from chia.util.streamable import Streamable, dataclass_from_dict, streamable
 
 log = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ def batch_pre_validate_blocks(
     check_filter: bool,
     expected_difficulty: List[uint64],
     expected_sub_slot_iters: List[uint64],
+    coin_store: CoinStore,
 ) -> List[bytes]:
     blocks = {}
     for k, v in blocks_pickled.items():
@@ -93,6 +95,7 @@ def batch_pre_validate_blocks(
                     check_filter,
                     expected_difficulty[i],
                     expected_sub_slot_iters[i],
+                    coin_store,
                 )
                 error_int: Optional[uint16] = None
                 if error is not None:
@@ -136,6 +139,7 @@ async def pre_validate_blocks_multiprocessing(
     npc_results: Dict[uint32, NPCResult],
     get_block_generator: Optional[Callable],
     batch_size: int,
+    coin_store: CoinStore,
     wp_summaries: Optional[List[SubEpochSummary]] = None,
 ) -> Optional[List[PreValidationResult]]:
     """
@@ -308,6 +312,7 @@ async def pre_validate_blocks_multiprocessing(
                 check_filter,
                 [diff_ssis[j][0] for j in range(i, end_i)],
                 [diff_ssis[j][1] for j in range(i, end_i)],
+                coin_store,
             )
         )
     # Collect all results into one flat list

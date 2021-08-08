@@ -7,6 +7,7 @@ from blspy import AugSchemeMPL
 
 from chia.consensus.block_record import BlockRecord
 from chia.consensus.blockchain_interface import BlockchainInterface
+from chia.consensus.coinbase import create_puzzlehash_for_pk
 from chia.consensus.constants import ConsensusConstants
 from chia.consensus.deficit import calculate_deficit
 from chia.consensus.difficulty_adjustment import can_finish_sub_and_full_epoch
@@ -20,6 +21,7 @@ from chia.consensus.pot_iterations import (
     is_overflow_block,
 )
 from chia.consensus.vdf_info_computation import get_signage_point_vdf_info
+from chia.full_node.coin_store import CoinStore
 from chia.types.blockchain_format.classgroup import ClassgroupElement
 from chia.types.blockchain_format.sized_bytes import bytes32
 from chia.types.blockchain_format.slots import ChallengeChainSubSlot, RewardChainSubSlot, SubSlotProofs
@@ -27,6 +29,7 @@ from chia.types.blockchain_format.vdf import VDFInfo, VDFProof
 from chia.types.end_of_slot_bundle import EndOfSubSlotBundle
 from chia.types.header_block import HeaderBlock
 from chia.types.unfinished_header_block import UnfinishedHeaderBlock
+from chia.util.bech32m import encode_puzzle_hash
 from chia.util.errors import Err, ValidationError
 from chia.util.hash import std_hash
 from chia.util.ints import uint8, uint32, uint64, uint128
@@ -42,6 +45,7 @@ def validate_unfinished_header_block(
     check_filter: bool,
     expected_difficulty: uint64,
     expected_sub_slot_iters: uint64,
+    coin_store: CoinStore,
     skip_overflow_last_ss_validation: bool = False,
     skip_vdf_is_valid: bool = False,
     check_sub_epoch_summary=True,
@@ -493,12 +497,21 @@ def validate_unfinished_header_block(
     if header_block.reward_chain_block.signage_point_index >= constants.NUM_SPS_SUB_SLOT:
         return None, ValidationError(Err.INVALID_SP_INDEX)
 
+    # query staking of the farmer public key
+    if prev_b is not None:
+        farmer_ph = header_block.reward_chain_block.proof_of_space.get_farmer_ph()
+        coins = coin_store.get_coin_records_by_puzzle_hash(False, farmer_ph, 0, prev_b.height)
+        staking = sum(coin.coin.amount for coin in coins)
+    else:
+        staking = uint64(0)
+
     # Note that required iters might be from the previous slot (if we are in an overflow block)
     required_iters: uint64 = calculate_iterations_quality(
         constants.DIFFICULTY_CONSTANT_FACTOR,
         q_str,
         header_block.reward_chain_block.proof_of_space.size,
         expected_difficulty,
+        staking,
         cc_sp_hash,
     )
 
@@ -831,6 +844,7 @@ def validate_finished_header_block(
     check_filter: bool,
     expected_difficulty: uint64,
     expected_sub_slot_iters: uint64,
+    coin_store: CoinStore,
     check_sub_epoch_summary=True,
 ) -> Tuple[Optional[uint64], Optional[ValidationError]]:
     """
@@ -854,6 +868,7 @@ def validate_finished_header_block(
         check_filter,
         expected_difficulty,
         expected_sub_slot_iters,
+        coin_store,
         False,
         check_sub_epoch_summary=check_sub_epoch_summary,
     )
