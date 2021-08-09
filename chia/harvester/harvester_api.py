@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 from typing import Callable, List, Tuple
 
-from blspy import AugSchemeMPL, G2Element, G1Element
+from blspy import AugSchemeMPL, G1Element, G2Element
 
 from chia.consensus.pot_iterations import calculate_iterations_quality, calculate_sp_interval_iters
 from chia.harvester.harvester import Harvester
@@ -88,6 +88,11 @@ class HarvesterAPI:
                     new_challenge.sp_hash,
                 )
                 try:
+                    staking = new_challenge.stakings[plot_info.farmer_public_key]
+                except KeyError as e:
+                    self.harvester.log.error(f"Error get staking for public key {plot_info.farmer_public_key}, {e}")
+                    return []
+                try:
                     quality_strings = plot_info.prover.get_qualities_for_challenge(sp_challenge_hash)
                 except Exception as e:
                     self.harvester.log.error(f"Error using prover object {e}")
@@ -117,6 +122,7 @@ class HarvesterAPI:
                             quality_str,
                             plot_info.prover.get_size(),
                             difficulty,
+                            staking,
                             new_challenge.sp_hash,
                         )
                         sp_interval_iters = calculate_sp_interval_iters(self.harvester.constants, sub_slot_iters)
@@ -140,10 +146,6 @@ class HarvesterAPI:
                                 local_master_sk,
                             ) = parse_plot_info(plot_info.prover.get_memo())
                             local_sk = master_sk_to_local_sk(local_master_sk)
-                            include_taproot = plot_info.pool_contract_puzzle_hash is not None
-                            plot_public_key = ProofOfSpace.generate_plot_public_key(
-                                local_sk.get_g1(), farmer_public_key, include_taproot
-                            )
                             responses.append(
                                 (
                                     quality_str,
@@ -151,7 +153,8 @@ class HarvesterAPI:
                                         sp_challenge_hash,
                                         plot_info.pool_public_key,
                                         plot_info.pool_contract_puzzle_hash,
-                                        plot_public_key,
+                                        local_sk.get_g1(),
+                                        farmer_public_key,
                                         uint8(plot_info.prover.get_size()),
                                         proof_xs,
                                     ),

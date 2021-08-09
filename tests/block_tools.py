@@ -9,32 +9,23 @@ import time
 from argparse import Namespace
 from dataclasses import replace
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple, Any
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
 from chiabip158 import PyBIP158
 
 from chia.cmds.init_funcs import create_all_ssl, create_default_chia_config
-from chia.full_node.bundle_tools import (
-    best_solution_generator_from_template,
-    detect_potential_template_generator,
-    simple_solution_generator,
-)
-from chia.util.errors import Err
-from chia.full_node.generator import setup_generator_args
-from chia.full_node.mempool_check_conditions import GENERATOR_MOD
-from chia.plotting.create_plots import create_plots
 from chia.consensus.block_creation import unfinished_block_to_full_block
 from chia.consensus.block_record import BlockRecord
 from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
 from chia.consensus.blockchain_interface import BlockchainInterface
-from chia.consensus.coinbase import create_puzzlehash_for_pk, create_farmer_coin, create_pool_coin
+from chia.consensus.coinbase import create_farmer_coin, create_pool_coin, create_puzzlehash_for_pk
 from chia.consensus.constants import ConsensusConstants
+from chia.consensus.cost_calculator import NPCResult, calculate_cost_of_program
 from chia.consensus.default_constants import DEFAULT_CONSTANTS
 from chia.consensus.deficit import calculate_deficit
 from chia.consensus.full_block_to_block_record import block_to_block_record
 from chia.consensus.make_sub_epoch_summary import next_sub_epoch_summary
-from chia.consensus.cost_calculator import NPCResult, calculate_cost_of_program
 from chia.consensus.pot_iterations import (
     calculate_ip_iters,
     calculate_iterations_quality,
@@ -43,7 +34,15 @@ from chia.consensus.pot_iterations import (
     is_overflow_block,
 )
 from chia.consensus.vdf_info_computation import get_signage_point_vdf_info
+from chia.full_node.bundle_tools import (
+    best_solution_generator_from_template,
+    detect_potential_template_generator,
+    simple_solution_generator,
+)
+from chia.full_node.generator import setup_generator_args
+from chia.full_node.mempool_check_conditions import GENERATOR_MOD
 from chia.full_node.signage_point import SignagePoint
+from chia.plotting.create_plots import create_plots
 from chia.plotting.plot_tools import PlotInfo, load_plots, parse_plot_info
 from chia.types.blockchain_format.classgroup import ClassgroupElement
 from chia.types.blockchain_format.coin import Coin, hash_coin_list
@@ -64,27 +63,28 @@ from chia.types.condition_with_args import ConditionWithArgs
 from chia.types.end_of_slot_bundle import EndOfSubSlotBundle
 from chia.types.full_block import FullBlock
 from chia.types.generator_types import BlockGenerator, CompressorArg
+from chia.types.name_puzzle_condition import NPC
 from chia.types.spend_bundle import SpendBundle
 from chia.types.unfinished_block import UnfinishedBlock
-from chia.types.name_puzzle_condition import NPC
 from chia.util.bech32m import encode_puzzle_hash
 from chia.util.block_cache import BlockCache
 from chia.util.condition_tools import ConditionOpcode, conditions_by_opcode
 from chia.util.config import load_config, save_config
+from chia.util.errors import Err
 from chia.util.hash import std_hash
 from chia.util.ints import uint8, uint16, uint32, uint64, uint128
 from chia.util.keychain import Keychain, bytes_to_mnemonic
 from chia.util.merkle_set import MerkleSet
-from chia.util.prev_transaction_block import get_prev_transaction_block
 from chia.util.path import mkdir
+from chia.util.prev_transaction_block import get_prev_transaction_block
 from chia.util.vdf_prover import get_vdf_info_and_proof
-from tests.wallet_tools import WalletTool
 from chia.wallet.derive_keys import (
     master_sk_to_farmer_sk,
     master_sk_to_local_sk,
     master_sk_to_pool_sk,
     master_sk_to_wallet_sk,
 )
+from tests.wallet_tools import WalletTool
 
 test_constants = DEFAULT_CONSTANTS.replace(
     **{
@@ -1015,27 +1015,12 @@ class BlockTools:
                     if required_iters < calculate_sp_interval_iters(constants, sub_slot_iters):
                         proof_xs: bytes = plot_info.prover.get_full_proof(new_challenge, proof_index)
 
-                        # Look up local_sk from plot to save locked memory
-                        (
-                            pool_public_key_or_puzzle_hash,
-                            farmer_public_key,
-                            local_master_sk,
-                        ) = parse_plot_info(plot_info.prover.get_memo())
-                        local_sk = master_sk_to_local_sk(local_master_sk)
-
-                        if isinstance(pool_public_key_or_puzzle_hash, G1Element):
-                            include_taproot = False
-                        else:
-                            assert isinstance(pool_public_key_or_puzzle_hash, bytes32)
-                            include_taproot = True
-                        plot_pk = ProofOfSpace.generate_plot_public_key(
-                            local_sk.get_g1(), farmer_public_key, include_taproot
-                        )
                         proof_of_space: ProofOfSpace = ProofOfSpace(
                             new_challenge,
                             plot_info.pool_public_key,
                             plot_info.pool_contract_puzzle_hash,
-                            plot_pk,
+                            plot_info.local_public_key,
+                            plot_info.farmer_public_key,
                             plot_info.prover.get_size(),
                             proof_xs,
                         )

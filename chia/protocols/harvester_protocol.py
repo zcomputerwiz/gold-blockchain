@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 from blspy import G1Element, G2Element
 
+from chia.protocols import farmer_protocol
 from chia.types.blockchain_format.proof_of_space import ProofOfSpace
 from chia.types.blockchain_format.sized_bytes import bytes32
 from chia.util.ints import uint8, uint64
@@ -38,6 +39,7 @@ class NewSignagePointHarvester(Streamable):
     signage_point_index: uint8
     sp_hash: bytes32
     pool_difficulties: List[PoolDifficulty]
+    stakings: Dict[G1Element, uint64]  # stakings of each farmer public key
 
 
 @dataclass(frozen=True)

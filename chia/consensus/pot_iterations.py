@@ -68,5 +68,5 @@ def calculate_iterations_quality(
     return max(iters, uint64(1))
 
 
-def modulate_difficulty(difficulty: uint64, _staking: uint64) -> uint64:
-    return difficulty
+def modulate_difficulty(difficulty: uint64, staking: uint64) -> uint64:
+    return uint64(difficulty * (0.5 + 1 / (256 * staking / difficulty + 2)))

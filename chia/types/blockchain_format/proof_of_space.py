@@ -25,14 +25,13 @@ class ProofOfSpace(Streamable):
     pool_contract_puzzle_hash: Optional[bytes32]
     local_public_key: G1Element
     farmer_public_key: G1Element
-    include_taproot: bool
     size: uint8
     proof: bytes
 
     @property
     def plot_public_key(self):
         return ProofOfSpace.generate_plot_public_key(
-            self.local_public_key, self.farmer_public_key, self.include_taproot
+            self.local_public_key, self.farmer_public_key, self.pool_contract_puzzle_hash is not None
         )
 
     def get_plot_id(self) -> bytes32:

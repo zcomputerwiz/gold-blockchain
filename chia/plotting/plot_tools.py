@@ -2,11 +2,11 @@ import logging
 import threading
 import time
 import traceback
+from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import reduce
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, Union
-from concurrent.futures.thread import ThreadPoolExecutor
 
 from blspy import G1Element, PrivateKey
 from chiapos import DiskProver
@@ -25,9 +25,16 @@ class PlotInfo:
     prover: DiskProver
     pool_public_key: Optional[G1Element]
     pool_contract_puzzle_hash: Optional[bytes32]
-    plot_public_key: G1Element
+    local_public_key: G1Element
+    farmer_public_key: G1Element
     file_size: int
     time_modified: float
+
+    @property
+    def plot_public_key(self):
+        return ProofOfSpace.generate_plot_public_key(
+            self.local_public_key, self.farmer_public_key, self.pool_contract_puzzle_hash is not None
+        )
 
 
 def _get_filenames(directory: Path) -> List[Path]:
@@ -235,10 +242,6 @@ def load_plots(
                 stat_info = filename.stat()
                 local_sk = master_sk_to_local_sk(local_master_sk)
 
-                plot_public_key: G1Element = ProofOfSpace.generate_plot_public_key(
-                    local_sk.get_g1(), farmer_public_key, pool_contract_puzzle_hash is not None
-                )
-
                 with plot_ids_lock:
                     if prover.get_id() in plot_ids:
                         log.warning(f"Have multiple copies of the plot {filename}, not adding it.")
@@ -249,7 +252,8 @@ def load_plots(
                     prover,
                     pool_public_key,
                     pool_contract_puzzle_hash,
-                    plot_public_key,
+                    local_sk.get_g1(),
+                    farmer_public_key,
                     stat_info.st_size,
                     stat_info.st_mtime,
                 )

@@ -86,3 +86,7 @@ class ProtocolMessageTypes(Enum):
     new_signage_point_harvester = 66
     request_plots = 67
     respond_plots = 68
+
+    # Stakings
+    request_stakings = 100
+    respond_stakings = 101

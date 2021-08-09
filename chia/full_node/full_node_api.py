@@ -2,7 +2,7 @@ import asyncio
 import dataclasses
 import time
 from secrets import token_bytes
-from typing import Callable, Dict, List, Optional, Tuple, Set
+from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from blspy import AugSchemeMPL, G2Element
 from chiabip158 import PyBIP158
@@ -32,7 +32,7 @@ from chia.types.mempool_inclusion_status import MempoolInclusionStatus
 from chia.types.mempool_item import MempoolItem
 from chia.types.peer_info import PeerInfo
 from chia.types.unfinished_block import UnfinishedBlock
-from chia.util.api_decorators import api_request, peer_required, bytes_required, execute_task
+from chia.util.api_decorators import api_request, bytes_required, execute_task, peer_required
 from chia.util.generator_tools import get_block_header
 from chia.util.hash import std_hash
 from chia.util.ints import uint8, uint32, uint64, uint128
@@ -1297,3 +1297,8 @@ class FullNodeAPI:
         if self.full_node.sync_store.get_sync_mode():
             return None
         await self.full_node.respond_compact_vdf(request, peer)
+
+    @api_request
+    async def request_stakings(self, request: farmer_protocol.RequestStakings) -> Optional[Message]:
+        msg = make_msg(ProtocolMessageTypes.respond_stakings, farmer_protocol.FarmerStakings(stakings=[]))
+        return msg
