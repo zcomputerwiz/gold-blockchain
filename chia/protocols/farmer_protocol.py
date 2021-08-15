@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from blspy import G1Element, G2Element
 
@@ -71,7 +71,7 @@ class SignedValues(Streamable):
 @dataclass(frozen=True)
 @streamable
 class FarmerStakings(Streamable):
-    stakings: Dict[G1Element, uint64]
+    stakings: List[Tuple[bytes32, uint64]]
 
 
 @dataclass(frozen=True)

@@ -5,6 +5,7 @@ from typing import Callable, List, Tuple
 
 from blspy import AugSchemeMPL, G1Element, G2Element
 
+from chia.consensus.coinbase import create_puzzlehash_for_pk
 from chia.consensus.pot_iterations import calculate_iterations_quality, calculate_sp_interval_iters
 from chia.harvester.harvester import Harvester
 from chia.plotting.plot_tools import PlotInfo, parse_plot_info
@@ -69,6 +70,8 @@ class HarvesterAPI:
 
         start = time.time()
         assert len(new_challenge.challenge_hash) == 32
+
+        stakings = dict(new_challenge.stakings)
 
         # Refresh plots to see if there are any new ones
         if start - self.harvester.last_load_time > self.harvester.plot_load_frequency:
@@ -168,9 +171,9 @@ class HarvesterAPI:
             if self.harvester._is_shutdown:
                 return filename, []
 
-            if new_challenge.stakings:
+            if stakings:
                 try:
-                    staking = new_challenge.stakings.get(plot_info.farmer_public_key, 0)
+                    staking = stakings[create_puzzlehash_for_pk(plot_info.farmer_public_key)]
                 except KeyError as e:
                     self.harvester.log.error(f"Error get staking for public key {plot_info.farmer_public_key}, {e}")
                     return filename, []

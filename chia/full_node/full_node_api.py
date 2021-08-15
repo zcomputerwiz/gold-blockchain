@@ -1,6 +1,7 @@
 import asyncio
 import dataclasses
 import time
+from collections import defaultdict
 from secrets import token_bytes
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
@@ -10,6 +11,7 @@ from chiabip158 import PyBIP158
 import chia.server.ws_connection as ws
 from chia.consensus.block_creation import create_unfinished_block
 from chia.consensus.block_record import BlockRecord
+from chia.consensus.coinbase import create_puzzlehash_for_pk
 from chia.consensus.pot_iterations import calculate_ip_iters, calculate_iterations_quality, calculate_sp_iters
 from chia.full_node.bundle_tools import best_solution_generator_from_template, simple_solution_generator
 from chia.full_node.full_node import FullNode
@@ -33,6 +35,7 @@ from chia.types.mempool_item import MempoolItem
 from chia.types.peer_info import PeerInfo
 from chia.types.unfinished_block import UnfinishedBlock
 from chia.util.api_decorators import api_request, bytes_required, execute_task, peer_required
+from chia.util.bech32m import encode_puzzle_hash
 from chia.util.generator_tools import get_block_header
 from chia.util.hash import std_hash
 from chia.util.ints import uint8, uint32, uint64, uint128
@@ -1309,5 +1312,15 @@ class FullNodeAPI:
 
     @api_request
     async def request_stakings(self, request: farmer_protocol.RequestStakings) -> Optional[Message]:
-        msg = make_msg(ProtocolMessageTypes.respond_stakings, farmer_protocol.FarmerStakings(stakings=[]))
+        peak_height = self.full_node.blockchain.get_peak_height()
+        if self.full_node.constants.staking_hardfork_activated(peak_height):
+            phs = [encode_puzzle_hash(create_puzzlehash_for_pk(pk)) for pk in request.public_keys]
+            stakings = defaultdict(uint64)
+            coins = self.full_node.coin_store.get_coin_records_by_puzzle_hashes(False, phs, 0, peak_height)
+            for coin in coins:
+                stakings[coin.coin.puzzle_hash] += coin.coin.amount
+            stakings = stakings.items()
+        else:
+            stakings = []
+        msg = make_msg(ProtocolMessageTypes.respond_stakings, farmer_protocol.FarmerStakings(stakings=stakings))
         return msg
