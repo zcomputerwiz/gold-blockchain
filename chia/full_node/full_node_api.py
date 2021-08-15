@@ -798,6 +798,8 @@ class FullNodeAPI:
             except ValueError as e:
                 self.log.warning(f"Value Error: {e}")
                 return None
+
+            staking = uint64(0)
             if prev_b is None:
                 pool_target = PoolTarget(
                     self.full_node.constants.GENESIS_PRE_FARM_POOL_PUZZLE_HASH,
@@ -811,6 +813,12 @@ class FullNodeAPI:
                 else:
                     assert request.pool_target is not None
                     pool_target = request.pool_target
+
+                if self.full_node.constants.staking_hardfork_activated(prev_b.height):
+                    coins = self.full_node.coin_store.get_coin_records_by_puzzle_hash(
+                        False, request.proof_of_space.get_farmer_ph(), 0, prev_b.height
+                    )
+                    staking = sum(coin.coin.amount for coin in coins)
 
             if peak is None or peak.height <= self.full_node.constants.MAX_SUB_SLOT_BLOCKS:
                 difficulty = self.full_node.constants.DIFFICULTY_STARTING
@@ -829,6 +837,7 @@ class FullNodeAPI:
                 quality_string,
                 request.proof_of_space.size,
                 difficulty,
+                staking,
                 request.challenge_chain_sp,
             )
             sp_iters: uint64 = calculate_sp_iters(self.full_node.constants, sub_slot_iters, request.signage_point_index)

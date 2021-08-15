@@ -215,11 +215,20 @@ async def pre_validate_blocks_multiprocessing(
                     block_records.remove_block_record(block_i.header_hash)
             return None
 
+        # query staking of the farmer public key
+        if prev_b is not None:
+            farmer_ph = block.reward_chain_block.proof_of_space.get_farmer_ph()
+            coins = coin_store.get_coin_records_by_puzzle_hash(False, farmer_ph, 0, prev_b.height)
+            staking = sum(coin.coin.amount for coin in coins)
+        else:
+            staking = uint64(0)
+
         required_iters: uint64 = calculate_iterations_quality(
             constants.DIFFICULTY_CONSTANT_FACTOR,
             q_str,
             block.reward_chain_block.proof_of_space.size,
             difficulty,
+            staking,
             cc_sp_hash,
         )
 

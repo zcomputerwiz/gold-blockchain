@@ -1010,6 +1010,7 @@ class BlockTools:
                         quality_str,
                         plot_info.prover.get_size(),
                         difficulty,
+                        0,
                         signage_point,
                     )
                     if required_iters < calculate_sp_interval_iters(constants, sub_slot_iters):
@@ -1239,6 +1240,7 @@ def load_block_list(
             quality_str,
             full_block.reward_chain_block.proof_of_space.size,
             uint64(difficulty),
+            0,
             sp_hash,
         )
 

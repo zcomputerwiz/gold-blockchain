@@ -77,7 +77,7 @@ class HarvesterAPI:
 
         loop = asyncio.get_running_loop()
 
-        def blocking_lookup(filename: Path, plot_info: PlotInfo) -> List[Tuple[bytes32, ProofOfSpace]]:
+        def blocking_lookup(filename: Path, plot_info: PlotInfo, staking: uint64) -> List[Tuple[bytes32, ProofOfSpace]]:
             # Uses the DiskProver object to lookup qualities. This is a blocking call,
             # so it should be run in a thread pool.
             try:
@@ -87,11 +87,6 @@ class HarvesterAPI:
                     new_challenge.challenge_hash,
                     new_challenge.sp_hash,
                 )
-                try:
-                    staking = new_challenge.stakings[plot_info.farmer_public_key]
-                except KeyError as e:
-                    self.harvester.log.error(f"Error get staking for public key {plot_info.farmer_public_key}, {e}")
-                    return []
                 try:
                     quality_strings = plot_info.prover.get_qualities_for_challenge(sp_challenge_hash)
                 except Exception as e:
@@ -154,9 +149,9 @@ class HarvesterAPI:
                                         plot_info.pool_public_key,
                                         plot_info.pool_contract_puzzle_hash,
                                         local_sk.get_g1(),
-                                        farmer_public_key,
                                         uint8(plot_info.prover.get_size()),
                                         proof_xs,
+                                        farmer_public_key,
                                     ),
                                 )
                             )
@@ -166,14 +161,24 @@ class HarvesterAPI:
                 return []
 
         async def lookup_challenge(
-            filename: Path, plot_info: PlotInfo
+            filename: Path, plot_info: PlotInfo, staking: uint64
         ) -> Tuple[Path, List[harvester_protocol.NewProofOfSpace]]:
             # Executes a DiskProverLookup in a thread pool, and returns responses
             all_responses: List[harvester_protocol.NewProofOfSpace] = []
             if self.harvester._is_shutdown:
                 return filename, []
+
+            if new_challenge.stakings:
+                try:
+                    staking = new_challenge.stakings.get(plot_info.farmer_public_key, 0)
+                except KeyError as e:
+                    self.harvester.log.error(f"Error get staking for public key {plot_info.farmer_public_key}, {e}")
+                    return filename, []
+            else:
+                staking = 0
+
             proofs_of_space_and_q: List[Tuple[bytes32, ProofOfSpace]] = await loop.run_in_executor(
-                self.harvester.executor, blocking_lookup, filename, plot_info
+                self.harvester.executor, blocking_lookup, filename, plot_info, staking
             )
             for quality_str, proof_of_space in proofs_of_space_and_q:
                 all_responses.append(
@@ -183,6 +188,7 @@ class HarvesterAPI:
                         quality_str.hex() + str(filename.resolve()),
                         proof_of_space,
                         new_challenge.signage_point_index,
+                        staking,
                     )
                 )
             return filename, all_responses

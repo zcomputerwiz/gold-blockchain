@@ -55,6 +55,10 @@ testnet_kwargs = {
     "MAX_GENERATOR_SIZE": 1000000,
     "MAX_GENERATOR_REF_LIST_SIZE": 512,  # Number of references allowed in the block generator ref list
     "POOL_SUB_SLOT_ITERS": 37600000000,  # iters limit * NUM_SPS
+    # hardfork block of rewarding change.
+    "HF_BLOCK_REWARD": -1,
+    # hardfork block of staking change.
+    "HF_BLOCK_STAKING": -1,
 }
 
 

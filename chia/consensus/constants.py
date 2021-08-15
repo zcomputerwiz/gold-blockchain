@@ -58,6 +58,11 @@ class ConsensusConstants:
     MAX_GENERATOR_REF_LIST_SIZE: uint32
     POOL_SUB_SLOT_ITERS: uint64
 
+    # hardfork block of rewarding change.
+    HF_BLOCK_REWARD: int
+    # hardfork block of staking change.
+    HF_BLOCK_STAKING: int
+
     def replace(self, **changes) -> "ConsensusConstants":
         return dataclasses.replace(self, **changes)
 
@@ -71,3 +76,9 @@ class ConsensusConstants:
                 changes[k] = hexstr_to_bytes(v)
 
         return dataclasses.replace(self, **changes)
+
+    def reward_hardfork_activated(self, height: uint32):
+        return self.HF_BLOCK_REWARD >= 0 and height >= self.HF_BLOCK_REWARD
+
+    def staking_hardfork_activated(self, height: uint32):
+        return self.HF_BLOCK_STAKING >= 0 and height >= self.HF_BLOCK_STAKING

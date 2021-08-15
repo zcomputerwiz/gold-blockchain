@@ -50,6 +50,7 @@ class NewProofOfSpace(Streamable):
     plot_identifier: str
     proof: ProofOfSpace
     signage_point_index: uint8
+    staking: uint64
 
 
 @dataclass(frozen=True)

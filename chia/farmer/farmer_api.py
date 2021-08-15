@@ -137,6 +137,7 @@ class FarmerAPI:
                     computed_quality_string,
                     new_proof_of_space.proof.size,
                     pool_state_dict["current_difficulty"],
+                    0,  # FIXME handle staking in pool protocol
                     new_proof_of_space.sp_hash,
                 )
                 if required_iters >= calculate_sp_interval_iters(

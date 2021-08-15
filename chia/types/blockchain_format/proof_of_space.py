@@ -1,3 +1,4 @@
+import copy
 import logging
 from dataclasses import dataclass
 from typing import Optional
@@ -23,16 +24,32 @@ class ProofOfSpace(Streamable):
     challenge: bytes32
     pool_public_key: Optional[G1Element]  # Only one of these two should be present
     pool_contract_puzzle_hash: Optional[bytes32]
-    local_public_key: G1Element
-    farmer_public_key: G1Element
+    plot_or_local_public_key: G1Element
     size: uint8
     proof: bytes
+    farmer_public_key: Optional[G1Element]
 
     @property
     def plot_public_key(self):
-        return ProofOfSpace.generate_plot_public_key(
-            self.local_public_key, self.farmer_public_key, self.pool_contract_puzzle_hash is not None
-        )
+        if self.farmer_public_key is None:
+            return self.plot_or_local_public_key
+        else:
+            return ProofOfSpace.generate_plot_public_key(
+                self.plot_or_local_public_key, self.farmer_public_key, self.pool_contract_puzzle_hash is not None
+            )
+
+    def to_legacy(self):
+        if self.farmer_public_key is not None:
+            return ProofOfSpace(
+                self.challenge,
+                self.pool_public_key,
+                self.pool_contract_puzzle_hash,
+                self.plot_public_key,
+                self.size,
+                self.proof,
+            )
+        else:
+            return copy.copy(self)
 
     def get_plot_id(self) -> bytes32:
         assert self.pool_public_key is None or self.pool_contract_puzzle_hash is None
