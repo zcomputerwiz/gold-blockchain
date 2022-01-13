@@ -3,14 +3,15 @@ import sys
 import time
 from datetime import datetime
 from decimal import Decimal
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import aiohttp
 
 from chia.cmds.units import units
+from chia.rpc.full_node_rpc_client import FullNodeRpcClient
 from chia.rpc.wallet_rpc_client import WalletRpcClient
 from chia.server.start_wallet import SERVICE_NAME
-from chia.util.bech32m import encode_puzzle_hash
+from chia.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
 from chia.util.byte_types import hexstr_to_bytes
 from chia.util.config import load_config
 from chia.util.default_root import DEFAULT_ROOT_PATH
@@ -27,7 +28,7 @@ def print_transaction(tx: TransactionRecord, verbose: bool, name) -> None:
         to_address = encode_puzzle_hash(tx.to_puzzle_hash, name)
         print(f"Transaction {tx.name}")
         print(f"Status: {'Confirmed' if tx.confirmed else ('In mempool' if tx.is_in_mempool() else 'Pending')}")
-        print(f"Amount: {chia_amount} {name}")
+        print(f"Amount {'sent' if tx.sent else 'received'}: {chia_amount} {name}")
         print(f"To address: {to_address}")
         print("Created at:", datetime.fromtimestamp(tx.created_at_time).strftime("%Y-%m-%d %H:%M:%S"))
         print("")
@@ -44,6 +45,9 @@ async def get_transaction(args: dict, wallet_client: WalletRpcClient, fingerprin
 
 async def get_transactions(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
     wallet_id = args["id"]
+    paginate = args["paginate"]
+    if paginate is None:
+        paginate = sys.stdout.isatty()
     txs: List[TransactionRecord] = await wallet_client.get_transactions(wallet_id)
     config = load_config(DEFAULT_ROOT_PATH, "config.yaml", SERVICE_NAME)
     name = config["network_overrides"]["config"][config["selected_network"]]["address_prefix"]
@@ -51,7 +55,7 @@ async def get_transactions(args: dict, wallet_client: WalletRpcClient, fingerpri
         print("There are no transactions to this address")
 
     offset = args["offset"]
-    num_per_screen = 5
+    num_per_screen = 5 if paginate else len(txs)
     for i in range(offset, len(txs), num_per_screen):
         for j in range(0, num_per_screen):
             if i + j >= len(txs):
@@ -68,12 +72,23 @@ async def get_transactions(args: dict, wallet_client: WalletRpcClient, fingerpri
                 break
 
 
+def check_unusual_transaction(amount: Decimal, fee: Decimal):
+    return fee >= amount
+
+
 async def send(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
     wallet_id = args["id"]
     amount = Decimal(args["amount"])
     fee = Decimal(args["fee"])
     address = args["address"]
+    override = args["override"]
 
+    if not override and check_unusual_transaction(amount, fee):
+        print(
+            f"A transaction of amount {amount} and fee {fee} is unusual.\n"
+            f"Pass in --override if you are sure you mean to do this."
+        )
+        return
     print("Submitting transaction...")
     final_amount = uint64(int(amount * units["chia"]))
     final_fee = uint64(int(fee * units["chia"]))
@@ -85,17 +100,38 @@ async def send(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> 
         tx = await wallet_client.get_transaction(wallet_id, tx_id)
         if len(tx.sent_to) > 0:
             print(f"Transaction submitted to nodes: {tx.sent_to}")
-            print(f"Do chia wallet get_transaction -f {fingerprint} -tx 0x{tx_id} to get status")
+            print(f"Do sit wallet get_transaction -f {fingerprint} -tx 0x{tx_id} to get status")
             return None
 
     print("Transaction not yet submitted to nodes")
-    print(f"Do 'chia wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
+    print(f"Do 'sit wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
 
 
 async def get_address(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
     wallet_id = args["id"]
     res = await wallet_client.get_next_address(wallet_id, False)
     print(res)
+
+
+async def delete_unconfirmed_transactions(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
+    wallet_id = args["id"]
+    await wallet_client.delete_unconfirmed_transactions(wallet_id)
+    print(f"Successfully deleted all unconfirmed transactions for wallet id {wallet_id} on key {fingerprint}")
+
+
+def wallet_coin_unit(typ: WalletType, address_prefix: str) -> Tuple[str, int]:
+    if typ == WalletType.COLOURED_COIN:
+        return "", units["colouredcoin"]
+    if typ in [WalletType.STANDARD_WALLET, WalletType.POOLING_WALLET, WalletType.MULTI_SIG, WalletType.RATE_LIMITED]:
+        return address_prefix, units["chia"]
+    return "", units["mojo"]
+
+
+def print_balance(amount: int, scale: int, address_prefix: str) -> str:
+    ret = f"{amount/scale} {address_prefix} "
+    if scale > 1:
+        ret += f"({amount} mojo)"
+    return ret
 
 
 async def print_balances(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
@@ -109,26 +145,60 @@ async def print_balances(args: dict, wallet_client: WalletRpcClient, fingerprint
     for summary in summaries_response:
         wallet_id = summary["id"]
         balances = await wallet_client.get_wallet_balance(wallet_id)
-        typ = WalletType(int(summary["type"])).name
-        if typ != "STANDARD_WALLET":
-            print(f"Wallet ID {wallet_id} type {typ} {summary['name']}")
-            print(f"   -Total Balance: " f"{balances['confirmed_wallet_balance']/units['colouredcoin']}")
-            print(f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['colouredcoin']}")
-            print(f"   -Spendable Balance: {balances['spendable_balance']/units['colouredcoin']}")
+        typ = WalletType(int(summary["type"]))
+        address_prefix, scale = wallet_coin_unit(typ, address_prefix)
+        print(f"Wallet ID {wallet_id} type {typ.name} {summary['name']}")
+        print(f"   -Total Balance: {print_balance(balances['confirmed_wallet_balance'], scale, address_prefix)}")
+        print(
+            f"   -Pending Total Balance: {print_balance(balances['unconfirmed_wallet_balance'], scale, address_prefix)}"
+        )
+        print(f"   -Spendable: {print_balance(balances['spendable_balance'], scale, address_prefix)}")
+
+
+async def send_from(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
+    wallet_id = args["id"]
+    address = decode_puzzle_hash(args["address"])
+    source = decode_puzzle_hash(args["source"])
+    rpc_port = args["rpc_port"]
+
+    coin_records = None
+    try:
+        config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
+        self_hostname = config["self_hostname"]
+        if rpc_port is None:
+            rpc_port = config["full_node"]["rpc_port"]
+        client = await FullNodeRpcClient.create(self_hostname, uint16(rpc_port), DEFAULT_ROOT_PATH, config)
+        coin_records = await client.get_coin_records_by_puzzle_hash(source, False)
+    except Exception as e:
+        if isinstance(e, aiohttp.ClientConnectorError):
+            print(f"Connection error. Check if full node is running at {rpc_port}")
         else:
-            print(f"Wallet ID {wallet_id} type {typ}")
-            print(
-                f"   -Total Balance: {balances['confirmed_wallet_balance']/units['chia']} {address_prefix} "
-                f"({balances['confirmed_wallet_balance']} mojo)"
-            )
-            print(
-                f"   -Pending Total Balance: {balances['unconfirmed_wallet_balance']/units['chia']} {address_prefix} "
-                f"({balances['unconfirmed_wallet_balance']} mojo)"
-            )
-            print(
-                f"   -Spendable: {balances['spendable_balance']/units['chia']} {address_prefix} "
-                f"({balances['spendable_balance']} mojo)"
-            )
+            print(f"Exception from 'full node' {e}")
+
+    client.close()
+    await client.await_closed()
+
+    coins = [cr.coin for cr in coin_records]
+    amount = sum(coin.amount for coin in coins)
+    additions = [
+        {
+            "puzzle_hash": address,
+            "amount": amount,
+        }
+    ]
+    res = await wallet_client.send_transaction_multi(wallet_id, additions, coins)
+    tx_id = res.name
+    start = time.time()
+    while time.time() - start < 10:
+        await asyncio.sleep(0.1)
+        tx = await wallet_client.get_transaction(wallet_id, tx_id)
+        if len(tx.sent_to) > 0:
+            print(f"Transaction submitted to nodes: {tx.sent_to}")
+            print(f"Do sit wallet get_transaction -f {fingerprint} -tx 0x{tx_id} to get status")
+            return None
+
+    print("Transaction not yet submitted to nodes")
+    print(f"Do 'sit wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
 
 
 async def get_wallet(wallet_client: WalletRpcClient, fingerprint: int = None) -> Optional[Tuple[WalletRpcClient, int]]:
@@ -137,7 +207,7 @@ async def get_wallet(wallet_client: WalletRpcClient, fingerprint: int = None) ->
     else:
         fingerprints = await wallet_client.get_public_keys()
     if len(fingerprints) == 0:
-        print("No keys loaded. Run 'chia keys generate' or import a key")
+        print("No keys loaded. Run 'sit keys generate' or import a key")
         return None
     if len(fingerprints) == 1:
         fingerprint = fingerprints[0]
@@ -180,13 +250,13 @@ async def get_wallet(wallet_client: WalletRpcClient, fingerprint: int = None) ->
             if "backup_path" not in log_in_response or use_cloud is False:
                 if use_cloud is True:
                     val = input(
-                        "No online backup file found, \n Press S to skip restore from backup"
-                        " \n Press F to use your own backup file: "
+                        "No online backup file found,\n Press S to skip restore from backup"
+                        "\n Press F to use your own backup file: "
                     )
                 else:
                     val = input(
-                        "Cloud backup declined, \n Press S to skip restore from backup"
-                        " \n Press F to use your own backup file: "
+                        "Cloud backup declined,\n Press S to skip restore from backup"
+                        "\n Press F to use your own backup file: "
                     )
 
                 if val.lower() == "s":
@@ -203,7 +273,9 @@ async def get_wallet(wallet_client: WalletRpcClient, fingerprint: int = None) ->
     return wallet_client, fingerprint
 
 
-async def execute_with_wallet(wallet_rpc_port: int, fingerprint: int, extra_params: dict, function: Callable) -> None:
+async def execute_with_wallet(
+    wallet_rpc_port: Optional[int], fingerprint: int, extra_params: Dict, function: Callable
+) -> None:
     try:
         config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
         self_hostname = config["self_hostname"]
@@ -221,7 +293,10 @@ async def execute_with_wallet(wallet_rpc_port: int, fingerprint: int, extra_para
         pass
     except Exception as e:
         if isinstance(e, aiohttp.ClientConnectorError):
-            print(f"Connection error. Check if wallet is running at {wallet_rpc_port}")
+            print(
+                f"Connection error. Check if the wallet is running at {wallet_rpc_port}. "
+                "You can run the wallet via:\n\tsit start wallet"
+            )
         else:
             print(f"Exception from 'wallet' {e}")
     wallet_client.close()

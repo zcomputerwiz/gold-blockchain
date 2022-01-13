@@ -1,5 +1,8 @@
 import logging
+from decimal import Decimal
 from typing import Dict, List, Optional
+
+from blspy import G1Element
 
 from chia.consensus.block_record import BlockRecord
 from chia.consensus.blockchain_interface import BlockchainInterface
@@ -17,6 +20,7 @@ class BlockCache(BlockchainInterface):
         headers: Dict[bytes32, HeaderBlock] = None,
         height_to_hash: Dict[uint32, bytes32] = None,
         sub_epoch_summaries: Dict[uint32, SubEpochSummary] = None,
+        inner: BlockchainInterface = None,
     ):
         if sub_epoch_summaries is None:
             sub_epoch_summaries = {}
@@ -30,6 +34,7 @@ class BlockCache(BlockchainInterface):
         self._sub_epoch_summaries = sub_epoch_summaries
         self._sub_epoch_segments: Dict[uint32, SubEpochSegments] = {}
         self.log = logging.getLogger(__name__)
+        self._inner = inner
 
     def block_record(self, header_hash: bytes32) -> BlockRecord:
         return self._block_records[header_hash]
@@ -92,3 +97,8 @@ class BlockCache(BlockchainInterface):
         if segments is None:
             return None
         return segments.challenge_segments
+
+    async def get_farmer_difficulty_coeff(
+        self, farmer_public_key: G1Element, height: Optional[uint32] = None
+    ) -> Decimal:
+        return await self._inner.get_farmer_difficulty_coeff(farmer_public_key, height)

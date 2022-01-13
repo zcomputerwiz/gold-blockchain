@@ -7,7 +7,7 @@ from chia.util.ws_message import WsRpcMessage, create_payload_dict
 class HarvesterRpcApi:
     def __init__(self, harvester: Harvester):
         self.service = harvester
-        self.service_name = "chia_harvester"
+        self.service_name = "sit_harvester"
 
     def get_routes(self) -> Dict[str, Callable]:
         return {
@@ -35,7 +35,7 @@ class HarvesterRpcApi:
         }
 
     async def refresh_plots(self, request: Dict) -> Dict:
-        await self.service.refresh_plots()
+        self.service.plot_manager.trigger_refresh()
         return {}
 
     async def delete_plot(self, request: Dict) -> Dict:

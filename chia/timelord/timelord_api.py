@@ -1,4 +1,6 @@
 import logging
+import time
+from decimal import Decimal
 from typing import Callable, Optional
 
 from chia.protocols import timelord_protocol
@@ -56,6 +58,7 @@ class TimelordAPI:
                     new_unfinished_block.reward_chain_block,
                     self.timelord.last_state.get_sub_slot_iters(),
                     self.timelord.last_state.get_difficulty(),
+                    Decimal(new_unfinished_block.difficulty_coeff),
                 )
             except Exception:
                 return None
@@ -80,5 +83,8 @@ class TimelordAPI:
         async with self.timelord.lock:
             if not self.timelord.sanitizer_mode:
                 return None
-            if vdf_info not in self.timelord.pending_bluebox_info:
-                self.timelord.pending_bluebox_info.append(vdf_info)
+            now = time.time()
+            # work older than 5s can safely be assumed to be from the previous batch, and needs to be cleared
+            while self.timelord.pending_bluebox_info and (now - self.timelord.pending_bluebox_info[0][0] > 5):
+                del self.timelord.pending_bluebox_info[0]
+            self.timelord.pending_bluebox_info.append((now, vdf_info))

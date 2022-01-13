@@ -9,7 +9,7 @@ def keys_cmd(ctx: click.Context):
 
     root_path: Path = ctx.obj["root_path"]
     if not root_path.is_dir():
-        raise RuntimeError("Please initialize (or migrate) your config directory with chia init")
+        raise RuntimeError("Please initialize (or migrate) your config directory with sit init")
 
 
 @keys_cmd.command("generate", short_help="Generates and adds a key to keychain")
@@ -101,10 +101,18 @@ def generate_and_print_cmd():
     required=True,
 )
 @click.option("--hd_path", "-t", help="Enter the HD path in the form 'm/12381/8444/n/n'", type=str, required=True)
-def sign_cmd(message: str, fingerprint: int, hd_path: str):
+@click.option(
+    "--as-bytes",
+    "-b",
+    help="Sign the message as sequence of bytes rather than UTF-8 string",
+    default=False,
+    show_default=True,
+    is_flag=True,
+)
+def sign_cmd(message: str, fingerprint: int, hd_path: str, as_bytes: bool):
     from .keys_funcs import sign
 
-    sign(message, fingerprint, hd_path)
+    sign(message, fingerprint, hd_path, as_bytes)
 
 
 @keys_cmd.command("verify", short_help="Verify a signature with a pk")

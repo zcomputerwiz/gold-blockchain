@@ -8,6 +8,7 @@ from pkg_resources import get_distribution
 from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
 THIS_IS_WINDOWS = platform.system().lower().startswith("win")
+THIS_IS_MAC = platform.system().lower().startswith("darwin")
 
 ROOT = pathlib.Path(importlib.import_module("chia").__file__).absolute().parent.parent
 
@@ -69,8 +70,12 @@ hiddenimports = []
 hiddenimports.extend(entry_points)
 hiddenimports.extend(keyring_imports)
 
-binaries = []
+binaries = [
+]
 
+if not THIS_IS_MAC:
+    binaries.extend([
+    ])
 
 if THIS_IS_WINDOWS:
     hiddenimports.extend(["win32timezone", "win32cred", "pywintypes", "win32ctypes.pywin32"])
@@ -154,7 +159,7 @@ def add_binary(name, path_to_script, collect_args):
 
 COLLECT_ARGS = []
 
-add_binary("chia", f"{ROOT}/chia/cmds/chia.py", COLLECT_ARGS)
+add_binary("sit", f"{ROOT}/chia/cmds/chia.py", COLLECT_ARGS)
 add_binary("daemon", f"{ROOT}/chia/daemon/server.py", COLLECT_ARGS)
 
 for server in SERVERS:

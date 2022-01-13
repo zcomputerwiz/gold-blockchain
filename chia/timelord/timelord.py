@@ -5,7 +5,8 @@ import logging
 import random
 import time
 import traceback
-from typing import Callable, Dict, List, Optional, Tuple, Set
+from decimal import Decimal
+from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from chiavdf import create_discriminant
 
@@ -89,7 +90,7 @@ class Timelord:
         self.total_infused: int = 0
         self.state_changed_callback: Optional[Callable] = None
         self.sanitizer_mode = self.config["sanitizer_mode"]
-        self.pending_bluebox_info: List[timelord_protocol.RequestCompactProofOfTime] = []
+        self.pending_bluebox_info: List[Tuple[float, timelord_protocol.RequestCompactProofOfTime]] = []
         self.last_active_time = time.time()
 
     async def _start(self):
@@ -166,6 +167,7 @@ class Timelord:
                 rc_block,
                 sub_slot_iters,
                 difficulty,
+                Decimal(block.difficulty_coeff),
             )
         except Exception as e:
             log.warning(f"Received invalid unfinished block: {e}.")
@@ -180,6 +182,9 @@ class Timelord:
                 break
         if found_index == -1:
             log.warning(f"Will not infuse {block.rc_prev} because its reward chain challenge is not in the chain")
+            return None
+        if ip_iters > block_ip_iters:
+            log.warning("Too late to infuse block")
             return None
 
         new_block_iters = uint64(block_ip_iters - ip_iters)
@@ -247,6 +252,7 @@ class Timelord:
                     self.iteration_to_proof_type[new_block_iters] = IterationType.INFUSION_POINT
         # Remove all unfinished blocks that have already passed.
         self.unfinished_blocks = new_unfinished_blocks
+        log.info(f"reset_chains new_unfinished_blocks: {len(self.unfinished_blocks)}")
         # Signage points.
         if not only_eos and len(self.signage_point_iters) > 0:
             count_signage = 0
@@ -305,6 +311,7 @@ class Timelord:
 
     async def _handle_subslot_end(self):
         self.last_state.set_state(self.new_subslot_end)
+        log.info(f"handle_subslot_end, unfinished_blocks: {len(self.unfinished_blocks)}")
         for block in self.unfinished_blocks:
             if self._can_infuse_unfinished_block(block) is not None:
                 self.total_unfinished += 1
@@ -465,6 +472,7 @@ class Timelord:
                             unfinished_block.reward_chain_block,
                             self.last_state.get_sub_slot_iters(),
                             self.last_state.get_difficulty(),
+                            Decimal(unfinished_block.difficulty_coeff),
                         )
                     except Exception as e:
                         log.error(f"Error {e}")
@@ -621,6 +629,7 @@ class Timelord:
                     self.new_peak = timelord_protocol.NewPeakTimelord(
                         new_reward_chain_block,
                         block.difficulty,
+                        block.difficulty_coeff,
                         uint8(new_deficit),
                         block.sub_slot_iters,
                         new_sub_epoch_summary,
@@ -1002,7 +1011,7 @@ class Timelord:
                         # CC_EOS and ICC_EOS. This guarantees everything is picked uniformly.
                         target_field_vdf = random.randint(1, 4)
                         info = next(
-                            (info for info in self.pending_bluebox_info if info.field_vdf == target_field_vdf),
+                            (info for info in self.pending_bluebox_info if info[1].field_vdf == target_field_vdf),
                             None,
                         )
                         if info is None:
@@ -1013,15 +1022,15 @@ class Timelord:
                             asyncio.create_task(
                                 self._do_process_communication(
                                     Chain.BLUEBOX,
-                                    info.new_proof_of_time.challenge,
+                                    info[1].new_proof_of_time.challenge,
                                     ClassgroupElement.get_default_element(),
                                     ip,
                                     reader,
                                     writer,
-                                    info.new_proof_of_time.number_of_iterations,
-                                    info.header_hash,
-                                    info.height,
-                                    info.field_vdf,
+                                    info[1].new_proof_of_time.number_of_iterations,
+                                    info[1].header_hash,
+                                    info[1].height,
+                                    info[1].field_vdf,
                                 )
                             )
                         )

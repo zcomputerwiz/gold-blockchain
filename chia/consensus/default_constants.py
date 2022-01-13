@@ -10,7 +10,7 @@ testnet_kwargs = {
     "SUB_SLOT_ITERS_STARTING": 2 ** 27,
     # DIFFICULTY_STARTING is the starting difficulty for the first epoch, which is then further
     # multiplied by another factor of DIFFICULTY_CONSTANT_FACTOR, to be used in the VDF iter calculation formula.
-    "DIFFICULTY_CONSTANT_FACTOR": 2 ** 67,
+    "DIFFICULTY_CONSTANT_FACTOR": 2 ** 57,
     "DIFFICULTY_STARTING": 7,
     "DIFFICULTY_CHANGE_MAX_FACTOR": 3,  # The next difficulty is truncated to range [prev / FACTOR, prev * FACTOR]
     # These 3 constants must be changed at the same time
@@ -28,18 +28,18 @@ testnet_kwargs = {
     # Used as the initial cc rc challenges, as well as first block back pointers, and first SES back pointer
     # We override this value based on the chain being run (testnet0, testnet1, mainnet, etc)
     # Default used for tests is std_hash(b'')
-    "GENESIS_CHALLENGE": bytes.fromhex("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+    "GENESIS_CHALLENGE": bytes.fromhex("a863ac9871ebeaf1fdc7ed6acd3d5c8c39441d53187a936868c87e1e233a3819"),
     # Forks of chia should change this value to provide replay attack protection. This is set to mainnet genesis chall
-    "AGG_SIG_ME_ADDITIONAL_DATA": bytes.fromhex("ccd5bb71183532bff220ba46c268991a3ff07eb358e8255a65c30a2dce0e5fbb"),
+    "AGG_SIG_ME_ADDITIONAL_DATA": bytes.fromhex("ecbf4458b47e39c60afec66e245fccb042871417ffc5200cb0140346c2e044d0"),
     "GENESIS_PRE_FARM_POOL_PUZZLE_HASH": bytes.fromhex(
-        "d23da14695a188ae5708dd152263c4db883eb27edeb936178d4d988b8f3ce5fc"
+        "d819c28786af76b7977b1f941d8f48e0d74bd6b89ccc4d1471b6be8430186c3a"
     ),
     "GENESIS_PRE_FARM_FARMER_PUZZLE_HASH": bytes.fromhex(
-        "3d8765d3a597ec1d99663f6c9816d915b9f68613ac94009884c4addaefcce6af"
+        "d819c28786af76b7977b1f941d8f48e0d74bd6b89ccc4d1471b6be8430186c3a"
     ),
     "MAX_VDF_WITNESS_SIZE": 64,
-    # Size of mempool = 50x the size of block
-    "MEMPOOL_BLOCK_BUFFER": 50,
+    # Size of mempool = 50x the size of block # temporary change until #9125 gets in
+    "MEMPOOL_BLOCK_BUFFER": 10,
     # Max coin amount, fits into 64 bits
     "MAX_COIN_AMOUNT": uint64((1 << 64) - 1),
     # Max block cost in clvm cost units
@@ -47,13 +47,18 @@ testnet_kwargs = {
     # The cost per byte of generator program
     "COST_PER_BYTE": 12000,
     "WEIGHT_PROOF_THRESHOLD": 2,
-    "BLOCKS_CACHE_SIZE": 4608 + (128 * 4),
+    "STAKING_ESTIMATE_BLOCK_RANGE": 4608 * 3,
+    "BLOCKS_CACHE_SIZE": 4608 * 3 + (128 * 4),  # should be bigger than STAKING_ESTIMAGE_BLOCK_RANGE
     "WEIGHT_PROOF_RECENT_BLOCKS": 1000,
-    "MAX_BLOCK_COUNT_PER_REQUESTS": 32,  # Allow up to 32 blocks per request
-    "INITIAL_FREEZE_END_TIMESTAMP": 1620061200,  # Mon May 03 2021 17:00:00 GMT+0000
+    "MAX_BLOCK_COUNT_PER_REQUESTS": 32,
     "NETWORK_TYPE": 0,
     "MAX_GENERATOR_SIZE": 1000000,
     "MAX_GENERATOR_REF_LIST_SIZE": 512,  # Number of references allowed in the block generator ref list
+    "POOL_SUB_SLOT_ITERS": 37600000000,  # iters limit * NUM_SPS
+    # hardfork block of rewarding change.
+    "HF_BLOCK_REWARD": -1,
+    # hardfork block of staking change.
+    "HF_BLOCK_STAKING": -1,
 }
 
 
