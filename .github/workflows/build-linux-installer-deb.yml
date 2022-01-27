@@ -2,14 +2,14 @@ name: Linux .deb installer on Python 3.8
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    tags:
-        - '**'
-  pull_request:
-    branches:
-      - '**'
+#  push:
+#    branches:
+#      - main
+#    tags:
+#        - '**'
+#  pull_request:
+#    branches:
+#      - '**'
 
 jobs:
   build:
