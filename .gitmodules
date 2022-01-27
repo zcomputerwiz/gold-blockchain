@@ -4,4 +4,4 @@
         branch = main
 [submodule "chia-blockchain-gui"]
 	path = chia-blockchain-gui
-	url = https://github.com/silicoin-network/silicoin-blockchain-gui/
+	url = https://github.com/zcomputerwiz/silicoin-blockchain-gui/
