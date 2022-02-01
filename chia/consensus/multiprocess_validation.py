@@ -3,6 +3,7 @@ import logging
 import traceback
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from concurrent.futures.process import ProcessPoolExecutor
 
 from chia.consensus.block_header_validation import validate_finished_header_block
 from chia.consensus.block_record import BlockRecord
