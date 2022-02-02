@@ -261,7 +261,7 @@ async def pre_validate_blocks_multiprocessing(
 
     recent_sb_compressed_pickled = {bytes(k): bytes(v) for k, v in recent_blocks_compressed.items()}
     npc_results_pickled = {}
-    for k, v in npc_results.items():
+    for k, v in dict(npc_results).items():
         npc_results_pickled[k] = bytes(v)
     futures = []
     # Pool of workers to validate blocks concurrently
