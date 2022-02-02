@@ -1,9 +1,7 @@
-import asyncio
 import logging
 import traceback
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
-from concurrent.futures.process import ProcessPoolExecutor
 
 from chia.consensus.block_header_validation import validate_finished_header_block
 from chia.consensus.block_record import BlockRecord
@@ -134,7 +132,6 @@ async def pre_validate_blocks_multiprocessing(
     constants_json: Dict,
     block_records: BlockchainInterface,
     blocks: Sequence[Union[FullBlock, HeaderBlock]],
-    pool: ProcessPoolExecutor,
     check_filter: bool,
     npc_results: Dict[uint32, NPCResult],
     get_block_generator: Optional[Callable],
@@ -149,7 +146,6 @@ async def pre_validate_blocks_multiprocessing(
     Args:
         check_filter:
         constants_json:
-        pool:
         constants:
         block_records:
         blocks: list of full blocks to validate (must be connected to current chain)
@@ -261,9 +257,9 @@ async def pre_validate_blocks_multiprocessing(
 
     recent_sb_compressed_pickled = {bytes(k): bytes(v) for k, v in recent_blocks_compressed.items()}
     npc_results_pickled = {}
-    for k, v in dict(npc_results).items():
+    for k, v in npc_results.items():
         npc_results_pickled[k] = bytes(v)
-    futures = []
+    results = []
     # Pool of workers to validate blocks concurrently
     for i in range(0, len(blocks), batch_size):
         end_i = min(i + batch_size, len(blocks))
@@ -304,27 +300,20 @@ async def pre_validate_blocks_multiprocessing(
                     hb_pickled = []
                 hb_pickled.append(bytes(block))
 
-        futures.append(
-            asyncio.get_running_loop().run_in_executor(
-                pool,
-                batch_pre_validate_blocks,
-                constants_json,
-                final_pickled,
-                b_pickled,
-                hb_pickled,
-                previous_generators,
-                npc_results_pickled,
-                check_filter,
-                [diff_ssis[j][0] for j in range(i, end_i)],
-                [diff_ssis[j][1] for j in range(i, end_i)],
-            )
+        results += batch_pre_validate_blocks(
+            block_records,
+            constants_json,
+            final_pickled,
+            b_pickled,
+            hb_pickled,
+            previous_generators,
+            npc_results_pickled,
+            check_filter,
+            [diff_ssis[j][0] for j in range(i, end_i)],
+            [diff_ssis[j][1] for j in range(i, end_i)],
         )
     # Collect all results into one flat list
-    return [
-        PreValidationResult.from_bytes(result)
-        for batch_result in (await asyncio.gather(*futures))
-        for result in batch_result
-    ]
+    return [PreValidationResult.from_bytes(result) for result in results]
 
 
 def _run_generator(
