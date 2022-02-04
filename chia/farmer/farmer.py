@@ -111,6 +111,9 @@ class Farmer:
         # number of responses to each signage point
         self.number_of_responses: Dict[bytes32, int] = {}
 
+        # farmer difficulty coefficient lookup per signage point
+        self.stakings: Dict[bytes32, str] = {}
+
         # A dictionary of keys to time added. These keys refer to keys in the above 4 dictionaries. This is used
         # to periodically clear the memory
         self.cache_add_time: Dict[bytes32, uint64] = {}
@@ -685,7 +688,7 @@ class Farmer:
         time_slept: uint64 = uint64(0)
         refresh_slept = 0
         while not self._shut_down:
-            self.log.info("[debug] clear cache")
+            #self.log.info("[debug] clear cache")
             try:
                 if time_slept > self.constants.SUB_SLOT_TIME_TARGET:
                     now = time.time()
@@ -696,6 +699,7 @@ class Farmer:
                             self.proofs_of_space.pop(key, None)
                             self.quality_str_to_identifiers.pop(key, None)
                             self.number_of_responses.pop(key, None)
+                            self.stakings.pop(key, None)
                             removed_keys.append(key)
                     for key in removed_keys:
                         self.cache_add_time.pop(key, None)

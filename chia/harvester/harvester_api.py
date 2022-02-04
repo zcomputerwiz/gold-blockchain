@@ -1,5 +1,6 @@
 import asyncio
 import time
+from decimal import Decimal
 from pathlib import Path
 from typing import Callable, List, Tuple
 
@@ -67,6 +68,8 @@ class HarvesterAPI:
         start = time.time()
         assert len(new_challenge.challenge_hash) == 32
 
+        #stakings = {bytes(k): Decimal(v) for k, v in new_challenge.stakings}
+
         loop = asyncio.get_running_loop()
 
         def blocking_lookup(
@@ -110,8 +113,7 @@ class HarvesterAPI:
                             self.harvester.constants.DIFFICULTY_CONSTANT_FACTOR,
                             quality_str,
                             plot_info.prover.get_size(),
-                            difficulty * 0.5,
-                            # difficulty_coeff,
+                            difficulty * self.harvester.filter_coeff,
                             new_challenge.sp_hash,
                         )
                         sp_interval_iters = calculate_sp_interval_iters(self.harvester.constants, sub_slot_iters)
@@ -163,7 +165,7 @@ class HarvesterAPI:
             all_responses: List[harvester_protocol.NewProofOfSpace] = []
             if self.harvester._is_shutdown:
                 return filename, []
-                
+
             # if stakings:
             #     try:
             #         difficulty_coeff = stakings[bytes(plot_info.farmer_public_key)]
@@ -184,8 +186,7 @@ class HarvesterAPI:
                         quality_str.hex() + str(filename.resolve()),
                         proof_of_space,
                         new_challenge.signage_point_index,
-                        # str(difficulty_coeff),
-                        str(1),
+                        self.harvester.filter_coeff,
                     )
                 )
             return filename, all_responses

@@ -4,6 +4,7 @@ import logging
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
+from decimal import Decimal
 
 from chia.consensus.coinbase import create_puzzlehash_for_pk
 import chia.server.ws_connection as ws  # lgtm [py/import-and-import-from]
@@ -35,6 +36,7 @@ class Harvester:
     _refresh_lock: asyncio.Lock
     event_loop: asyncio.events.AbstractEventLoop
     config: Dict
+    filter_coeff: Decimal
 
     def __init__(self, root_path: Path, config: Dict, constants: ConsensusConstants):
         self.log = log
@@ -61,6 +63,7 @@ class Harvester:
         self.cached_challenges = []
         self.state_changed_callback: Optional[Callable] = None
         self.parallel_read: bool = config.get("parallel_read", True)
+        self.filter_coeff: Decimal = config.get("filter_coeff", "0.5")
 
     async def _start(self):
         self._refresh_lock = asyncio.Lock()
