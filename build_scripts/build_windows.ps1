@@ -83,13 +83,13 @@ pip install keyring==23.0.1 --no-binary :all:
 pip install keyrings.cryptfile==1.3.4 --no-binary :all:
 
 Write-Output "   ---"
-Write-Output "Use pyinstaller to create silicoin .exe's"
+Write-Output "Use pyinstaller to create gold .exe's"
 Write-Output "   ---"
 $SPEC_FILE = (python -c 'import chia; print(chia.PYINSTALLER_SPEC_PATH)') -join "`n"
 pyinstaller --log-level INFO $SPEC_FILE
 
 Write-Output "   ---"
-Write-Output "Copy silicoin executables to chia-blockchain-gui\"
+Write-Output "Copy gold executables to chia-blockchain-gui\"
 Write-Output "   ---"
 Copy-Item "dist\daemon" -Destination "..\chia-blockchain-gui\" -Recurse
 Set-Location -Path "..\chia-blockchain-gui" -PassThru
@@ -116,12 +116,12 @@ If ($LastExitCode -gt 0){
 }
 
 Write-Output "   ---"
-Write-Output "Increase the stack for silicoin command for (silicoin plots create) chiapos limitations"
+Write-Output "Increase the stack for gold command for (gold plots create) chiapos limitations"
 # editbin.exe needs to be in the path
 editbin.exe /STACK:8000000 daemon\chia.exe
 Write-Output "   ---"
 
-$appName = "SIT"
+$appName = "Gold"
 $packageVersion = "$env:CHIA_INSTALLER_VERSION"
 $packageName = "$appName-$packageVersion"
 
@@ -152,8 +152,8 @@ If ($env:HAS_SECRET) {
    Write-Output "   ---"
    Write-Output "Add timestamp and verify signature"
    Write-Output "   ---"
-   signtool.exe timestamp /v /t http://timestamp.comodoca.com/ .\release-builds\windows-installer\SITSetup-$packageVersion.exe
-   signtool.exe verify /v /pa .\release-builds\windows-installer\SITSetup-$packageVersion.exe
+   signtool.exe timestamp /v /t http://timestamp.comodoca.com/ .\release-builds\windows-installer\GoldSetup-$packageVersion.exe
+   signtool.exe verify /v /pa .\release-builds\windows-installer\GoldSetup-$packageVersion.exe
    }   Else    {
    Write-Output "Skipping timestamp and verify signatures - no authorization to install certificates"
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-APP_BUNDLEID="net.silicoin.blockchain"
-APP_NAME="SIT"
+APP_BUNDLEID="net.gold.blockchain"
+APP_NAME="Gold"
 DIR_NAME=$APP_NAME-darwin-x64
 
 set -euo pipefail
