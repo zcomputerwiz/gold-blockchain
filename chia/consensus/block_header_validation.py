@@ -517,7 +517,7 @@ def validate_unfinished_header_block(
         constants.DIFFICULTY_CONSTANT_FACTOR,
         q_str,
         header_block.reward_chain_block.proof_of_space.size,
-        expected_difficulty * difficulty_coeff,
+        Decimal(expected_difficulty * difficulty_coeff),
         cc_sp_hash,
     )
 

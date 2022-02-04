@@ -95,7 +95,7 @@ class FarmerAPI:
                 self.farmer.constants.DIFFICULTY_CONSTANT_FACTOR,
                 computed_quality_string,
                 new_proof_of_space.proof.size,
-                sp.difficulty * Decimal(new_proof_of_space.difficulty_coeff),
+                Decimal(sp.difficulty * Decimal(new_proof_of_space.difficulty_coeff)),
                 new_proof_of_space.sp_hash,
             )
 
@@ -155,7 +155,7 @@ class FarmerAPI:
                     self.farmer.constants.DIFFICULTY_CONSTANT_FACTOR,
                     computed_quality_string,
                     new_proof_of_space.proof.size,
-                    sp.difficulty * Decimal(new_proof_of_space.difficulty_coeff),
+                    Decimal(sp.difficulty * Decimal(new_proof_of_space.difficulty_coeff)),
                     new_proof_of_space.sp_hash,
                 )
                 if required_iters < calculate_sp_interval_iters(self.farmer.constants, sp.sub_slot_iters):
