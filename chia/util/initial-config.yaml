@@ -89,6 +89,8 @@ harvester:
     batch_size: 300 # How many plot files the harvester processes before it waits batch_sleep_milliseconds
     batch_sleep_milliseconds: 1 # Milliseconds the harvester sleeps between batch processing
 
+  # Specify farmer difficulty coefficient for harvester filter, default is 0.5
+  filter_coeff: 0.5
 
   # If True use parallel reads in chiapos
   parallel_read: True

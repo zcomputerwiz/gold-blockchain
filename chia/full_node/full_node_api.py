@@ -873,7 +873,7 @@ class FullNodeAPI:
                 self.full_node.constants.DIFFICULTY_CONSTANT_FACTOR,
                 quality_string,
                 request.proof_of_space.size,
-                Decimal(difficulty * difficulty_coeff),
+                Decimal(int(difficulty) * Decimal(difficulty_coeff)),
                 request.challenge_chain_sp,
             )
             sp_iters: uint64 = calculate_sp_iters(self.full_node.constants, sub_slot_iters, request.signage_point_index)

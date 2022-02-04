@@ -63,7 +63,7 @@ class Harvester:
         self.cached_challenges = []
         self.state_changed_callback: Optional[Callable] = None
         self.parallel_read: bool = config.get("parallel_read", True)
-        self.filter_coeff: Decimal = config.get("filter_coeff", "0.5")
+        self.filter_coeff: Decimal = Decimal(config.get("filter_coeff", "0.5"))
 
     async def _start(self):
         self._refresh_lock = asyncio.Lock()

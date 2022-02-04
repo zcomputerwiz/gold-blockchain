@@ -113,7 +113,7 @@ class HarvesterAPI:
                             self.harvester.constants.DIFFICULTY_CONSTANT_FACTOR,
                             quality_str,
                             plot_info.prover.get_size(),
-                            Decimal(difficulty * self.harvester.filter_coeff),
+                            Decimal(int(difficulty) * Decimal(self.harvester.filter_coeff)),
                             new_challenge.sp_hash,
                         )
                         sp_interval_iters = calculate_sp_interval_iters(self.harvester.constants, sub_slot_iters)
