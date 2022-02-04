@@ -24,12 +24,12 @@ def init_cmd(ctx: click.Context, create_certs: str, fix_ssl_permissions: bool, t
 
     \b
     Follow these steps to create new certificates for a remote harvester:
-    - Make a copy of your Farming Machine CA directory: ~/.sit/[version]/config/ssl/ca
-    - Shut down all silicoin daemon processes with `sit stop all -d`
-    - Run `sit init -c [directory]` on your remote harvester,
+    - Make a copy of your Farming Machine CA directory: ~/.gold/[version]/config/ssl/ca
+    - Shut down all gold daemon processes with `gold stop all -d`
+    - Run `gold init -c [directory]` on your remote harvester,
       where [directory] is the the copy of your Farming Machine CA directory
-    - Get more details on remote harvester on Silicoin wiki:
-      https://github.com/silicoin-network/silicoin-blockchain/wiki/Farming-on-many-machines
+    - Get more details on remote harvester on Gold wiki:
+      https://github.com/gold-network/gold-blockchain/wiki/Farming-on-many-machines
     """
     from pathlib import Path
     from .init_funcs import init

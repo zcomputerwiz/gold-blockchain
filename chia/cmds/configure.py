@@ -93,18 +93,18 @@ def configure(
         if testnet == "true" or testnet == "t":
             print("Setting Testnet")
             testnet_port = "58444"
-            testnet_introducer = "beta1_introducer.chia.net"
-            testnet_dns_introducer = "dns-introducer-testnet7.chia.net"
-            testnet = "testnet7"
-            config["full_node"]["port"] = int(testnet_port)
-            config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
-            config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
-            config["timelord"]["full_node_peer"]["port"] = int(testnet_port)
-            config["wallet"]["full_node_peer"]["port"] = int(testnet_port)
-            config["wallet"]["introducer_peer"]["port"] = int(testnet_port)
-            config["introducer"]["port"] = int(testnet_port)
-            config["full_node"]["introducer_peer"]["host"] = testnet_introducer
-            config["full_node"]["dns_servers"] = [testnet_dns_introducer]
+            # testnet_introducer = "beta1_introducer.chia.net"
+            # testnet_dns_introducer = "dns-introducer-testnet7.chia.net"
+            testnet = "testnet"
+            # config["full_node"]["port"] = int(testnet_port)
+            # config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
+            # config["farmer"]["full_node_peer"]["port"] = int(testnet_port)
+            # config["timelord"]["full_node_peer"]["port"] = int(testnet_port)
+            # config["wallet"]["full_node_peer"]["port"] = int(testnet_port)
+            # config["wallet"]["introducer_peer"]["port"] = int(testnet_port)
+            # config["introducer"]["port"] = int(testnet_port)
+            # # config["full_node"]["introducer_peer"]["host"] = testnet_introducer
+            # # config["full_node"]["dns_servers"] = [testnet_dns_introducer]
             config["selected_network"] = testnet
             config["harvester"]["selected_network"] = testnet
             config["pool"]["selected_network"] = testnet
@@ -120,18 +120,18 @@ def configure(
         elif testnet == "false" or testnet == "f":
             print("Setting Mainnet")
             mainnet_port = "8444"
-            mainnet_introducer = "introducer.chia.net"
-            mainnet_dns_introducer = "dns-introducer.chia.net"
+            # mainnet_introducer = "introducer.chia.net"
+            # mainnet_dns_introducer = "dns-introducer.chia.net"
             net = "mainnet"
-            config["full_node"]["port"] = int(mainnet_port)
-            config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)
-            config["farmer"]["full_node_peer"]["port"] = int(mainnet_port)
-            config["timelord"]["full_node_peer"]["port"] = int(mainnet_port)
-            config["wallet"]["full_node_peer"]["port"] = int(mainnet_port)
-            config["wallet"]["introducer_peer"]["port"] = int(mainnet_port)
-            config["introducer"]["port"] = int(mainnet_port)
-            config["full_node"]["introducer_peer"]["host"] = mainnet_introducer
-            config["full_node"]["dns_servers"] = [mainnet_dns_introducer]
+            # config["full_node"]["port"] = int(mainnet_port)
+            # config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)
+            # config["farmer"]["full_node_peer"]["port"] = int(mainnet_port)
+            # config["timelord"]["full_node_peer"]["port"] = int(mainnet_port)
+            # config["wallet"]["full_node_peer"]["port"] = int(mainnet_port)
+            # config["wallet"]["introducer_peer"]["port"] = int(mainnet_port)
+            # config["introducer"]["port"] = int(mainnet_port)
+            # config["full_node"]["introducer_peer"]["host"] = mainnet_introducer
+            # config["full_node"]["dns_servers"] = [mainnet_dns_introducer]
             config["selected_network"] = net
             config["harvester"]["selected_network"] = net
             config["pool"]["selected_network"] = net
@@ -151,7 +151,7 @@ def configure(
         change_made = True
 
     if change_made:
-        print("Restart any running silicoin services for changes to take effect")
+        print("Restart any running gold services for changes to take effect")
         save_config(root_path, "config.yaml", config)
     return 0
 

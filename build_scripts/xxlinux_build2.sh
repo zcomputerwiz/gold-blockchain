@@ -38,8 +38,8 @@ fi
 
 
 APP_VERSION=$1
-APP_BUNDLEID="net.silicoin.blockchain"
-APP_NAME="SIT"
+APP_BUNDLEID="net.gold.blockchain"
+APP_NAME="Gold"
 DMG_NAME="$APP_NAME-$APP_VERSION"
 
 PLATFORM="amd64"

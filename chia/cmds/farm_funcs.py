@@ -238,7 +238,7 @@ async def summary(
         print("Farming")
 
     if amounts is not None:
-        print(f"Total silicoin farmed: {amounts['farmed_amount'] / units['chia']}")
+        print(f"Total gold farmed: {amounts['farmed_amount'] / units['chia']}")
         print(f"User transaction fees: {amounts['fee_amount'] / units['chia']}")
         print(f"Block rewards: {(amounts['farmer_reward_amount'] + amounts['pool_reward_amount']) / units['chia']}")
         print(f"Last height farmed: {amounts['last_height_farmed']}")
@@ -313,9 +313,9 @@ async def summary(
     if amounts is None:
         if wallet_not_running:
             print(
-                "For details on farmed rewards and fees you should run 'sit start wallet' and 'sit wallet show'"
+                "For details on farmed rewards and fees you should run 'gold start wallet' and 'gold wallet show'"
             )
         elif wallet_not_ready:
-            print("For details on farmed rewards and fees you should run 'sit wallet show'")
+            print("For details on farmed rewards and fees you should run 'gold wallet show'")
     else:
-        print("Note: log into your key using 'sit wallet show' to see rewards for each key")
+        print("Note: log into your key using 'gold wallet show' to see rewards for each key")

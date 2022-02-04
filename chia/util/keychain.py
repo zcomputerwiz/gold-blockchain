@@ -16,7 +16,7 @@ from chia.util.hash import std_hash
 from chia.util.keyring_wrapper import KeyringWrapper
 
 CURRENT_KEY_VERSION = "1.8"
-DEFAULT_USER = f"user-silicoin-{CURRENT_KEY_VERSION}"  # e.g. user-chia-1.8
+DEFAULT_USER = f"user-gold-{CURRENT_KEY_VERSION}"  # e.g. user-chia-1.8
 DEFAULT_SERVICE = f"chia-{DEFAULT_USER}"  # e.g. chia-user-chia-1.8
 DEFAULT_PASSPHRASE_PROMPT = (
     colorama.Fore.YELLOW + colorama.Style.BRIGHT + "(Unlock Keyring)" + colorama.Style.RESET_ALL + " Passphrase: "

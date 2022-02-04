@@ -147,17 +147,17 @@ class Farmer:
         ]
 
         if len(self.get_public_keys()) == 0:
-            error_str = "No keys exist. Please run 'sit keys generate' or open the UI."
+            error_str = "No keys exist. Please run 'gold keys generate' or open the UI."
             raise RuntimeError(error_str)
 
         # This is the farmer configuration
-        self.farmer_target_encoded = self.config["sit_target_address"]
+        self.farmer_target_encoded = self.config["gl_target_address"]
         self.farmer_target = decode_puzzle_hash(self.farmer_target_encoded)
 
         self.pool_public_keys = [G1Element.from_bytes(bytes.fromhex(pk)) for pk in self.config["pool_public_keys"]]
 
         # This is the self pooling configuration, which is only used for original self-pooled plots
-        self.pool_target_encoded = self.pool_config["sit_target_address"]
+        self.pool_target_encoded = self.pool_config["gl_target_address"]
         self.pool_target = decode_puzzle_hash(self.pool_target_encoded)
         self.pool_sks_map: Dict = {}
         for key in self.get_private_keys():
@@ -166,7 +166,7 @@ class Farmer:
         assert len(self.farmer_target) == 32
         assert len(self.pool_target) == 32
         if len(self.pool_sks_map) == 0:
-            error_str = "No keys exist. Please run 'sit keys generate' or open the UI."
+            error_str = "No keys exist. Please run 'gold keys generate' or open the UI."
             raise RuntimeError(error_str)
 
         # The variables below are for use with an actual pool
@@ -534,11 +534,11 @@ class Farmer:
         if farmer_target_encoded is not None:
             self.farmer_target_encoded = farmer_target_encoded
             self.farmer_target = decode_puzzle_hash(farmer_target_encoded)
-            config["farmer"]["sit_target_address"] = farmer_target_encoded
+            config["farmer"]["gl_target_address"] = farmer_target_encoded
         if pool_target_encoded is not None:
             self.pool_target_encoded = pool_target_encoded
             self.pool_target = decode_puzzle_hash(pool_target_encoded)
-            config["pool"]["sit_target_address"] = pool_target_encoded
+            config["pool"]["gl_target_address"] = pool_target_encoded
         save_config(self._root_path, "config.yaml", config)
 
     async def set_payout_instructions(self, launcher_id: bytes32, payout_instructions: str):

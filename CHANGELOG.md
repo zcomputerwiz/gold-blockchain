@@ -282,7 +282,7 @@ OG plots made before this release can continue to be farmed side by side with th
 - The exact commit after which Plot NFTs should be valid is the 89f7a4b3d6329493cd2b4bc5f346a819c99d3e7b commit (in which `pools.testnet9` branch was merged to main) or 5d62b3d1481c1e225d8354a012727ab263342c0a within the `pools.testnet9` branch.
 - `chia farm summary` and the GUI now use a new RPC endpoint to properly show plots for local and remote harvesters. This should address issues #6563, #5881, #3875, #1461.
 - `chia configure` now supports command line updates to peer count and target peer count.
-- Thank you @gldecurtins for adding logging support for remote syslog.
+- Thank you @sitecurtins for adding logging support for remote syslog.
 - Thanks to @maran and @Animazing for adding farmer and pool public key display to the RPC.
 - We have added translations for Hungarian, Belarusian, Catalan, and Albanian.  For Hungarian thanks to @SirGeoff, @azazio @onokaxxx, @rolandfarkasCOM, @HUNDavid , @horvathpalzsolt, @stishun74, @tusdavgaming, @idotitusz, @rasocsabi, @mail.kope, @gsprblnt, @mbudahazi, @csiberius, @tomatos83, @zok42, @ocel0t, @rwtoptomi, @djxpitke, @ftamas85, @zotya0330, @fnni, @kapabeates, @zamery, @viktor.gonczi, @pal.suta, @miv, and @Joeman_. For Belarusian thanks to @shurix83, @haxycgm, and @metalomaniax. For Catalan thank you to @Poliwhirl, @Pep-33, @marqmarti, @meuca, @Guiwdin, @carlescampi, @jairobtx, @Neoares, @darknsis, @augustfarrerasgimeno, and @fornons. Finally for Albanian thanks to @ATSHOOTER and @lakedeejay. We apologize if we missed anyone and welcome corrections.
 - Our release process is now fully automated from tagging a release to publishing installers to all of the appropriate locations and now makes the release artifacts available via torrents as well.
@@ -321,7 +321,7 @@ OG plots made before this release can continue to be farmed side by side with th
 - The delete plots button in the Windows GUI has been fixed and re-enabled.
 - Sometimes upon startup, the GUI takes a while to load the plots to display. We've made a temporary improvement that adds a "Refresh Plots" button whenever the GUI has not yet found plots.
 - Correctly display private key in `chia keys show`.
-- Thanks to @gldecurtins for removing a default printout of the private key mnemonic in `chia keys show`.
+- Thanks to @sitecurtins for removing a default printout of the private key mnemonic in `chia keys show`.
 - Shutting down the full node is cleaner and manages uPnP better.
 - DNS introducer could fail.
 - Fixed a potential timelord bug that could lead to a chain stall.
@@ -621,7 +621,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is the first production release of the Chia Blockchain. This can be installed and will wait for the green flag that will be dropped at approximately 7AM PDST (14:00 UTC) on Friday March 19, 2021. All farming rewards from that point forward will be considered valid and valuable XCH. There is a six week lock on all transactions. During those six weeks farmers will be earning their farming rewards but those rewards can not be spent.
+- This is the first production release of the Chia Blockchain. This can be installed and will wait for the green flag that will be dropped at approximately 7AM PDST (14:00 UTC) on Friday March 19, 2021. All farming rewards from that point forward will be considered valid and valuable GL. There is a six week lock on all transactions. During those six weeks farmers will be earning their farming rewards but those rewards can not be spent.
 - Initial difficulty will be set for 100PB. This may mean the initial epoch may be slow. Mainnet difficulty resets are targeted for 24 hours so this difficulty will adjust to the actual space brought online in 24 to 48 hours after launch.
 - Transactions are not enabled in the 1.0.0 version and will be soft forked in during the six week period via a 1.1.0 release.
 - There will also be a 1.0.1 release after the green flag process is complete to simplify install for new users by removing the green flag alert. In the interim there will be new testnet releases using the 1.1bx version scheme.
@@ -655,13 +655,13 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Found and fixed another green flag related issue
 - Fixed an issue with weight proofs where all sub-epochs were sampled, and the size of the weight proof kept growing
 - Fixed an issue with install-gui.sh, where npm audit fix was failing. (Thanks @Depado!)
-- Migration with CHIA_ROOT set does not crash silicoin init
+- Migration with GOLD_ROOT set does not crash gold init
 
 ## 1.0rc8 aka Release Candidate 8 - 2021-03-15
 
 ### Added
 
-- This is a hard fork/breaking change from RC6/7. TXCH Coins will **not** be moved forward but your plots and keys and parts of your configuration do. When you install this version before 10AM PDST on 3/16/2021 it will load up, start finding peers, and otherwise wait for the flag drop at that time to start farming. This is likely to be the last dress rehearsal for mainnet launch. Our [3/15/2021 blog post](https://www.chia.net/2021/03/15/mainnet-update.html) has more details on the current mainnet launch plan.
+- This is a hard fork/breaking change from RC6/7. TGL Coins will **not** be moved forward but your plots and keys and parts of your configuration do. When you install this version before 10AM PDST on 3/16/2021 it will load up, start finding peers, and otherwise wait for the flag drop at that time to start farming. This is likely to be the last dress rehearsal for mainnet launch. Our [3/15/2021 blog post](https://www.chia.net/2021/03/15/mainnet-update.html) has more details on the current mainnet launch plan.
 - The GUI now has a tooltip that directs users to the explanation of the plot filter.
 - The GUI now has a tooltip to explain the "Disable bitfield plotting" option. Thanks @shaneo257 for the idea.
 - The GUI now has a tooltip to explain Hierarchical Deterministic keys next to Receive Address on the Wallet page.
@@ -672,7 +672,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Harvester now catches another error class and continues to harvest. Thanks to @xorinox for this PR.
 - We now use a smaller weight proof sample size to ease the load on smaller machines when syncing.
 - Starting the GUI from Linux will now also error out if `npm run build` is run outside the venv. Huge thanks to @dkackman for that PR.
-- `chia farm summary` will now display TXCH or XCH as appropriate.
+- `chia farm summary` will now display TGL or GL as appropriate.
 - We added more time to our API timeouts and improved logging around times outs.
 
 ### Fixed
@@ -711,7 +711,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is a hard fork/breaking change from RC5. TXCH Coins will **not** be moved forward but your plots and keys and parts of your configuration do. We will be testing the final mainnet release strategy with the launch of RC6. For the test, those who are comfortable running the dev branch will update and start up their farms. All harvesters and plots will load and until the green flag drops, peers will be gossiped so your farm can establish good network connectivity. When the flag drops, each node will pull down the signed genesis challenge and start farming. Block 1 will be broadcast to anyone who hasn't seen the flag drop yet. The only difference for mainnet is that there will be 1.0 installers and a main branch release more than 24 hours before the real green flag.
+- This is a hard fork/breaking change from RC5. TGL Coins will **not** be moved forward but your plots and keys and parts of your configuration do. We will be testing the final mainnet release strategy with the launch of RC6. For the test, those who are comfortable running the dev branch will update and start up their farms. All harvesters and plots will load and until the green flag drops, peers will be gossiped so your farm can establish good network connectivity. When the flag drops, each node will pull down the signed genesis challenge and start farming. Block 1 will be broadcast to anyone who hasn't seen the flag drop yet. The only difference for mainnet is that there will be 1.0 installers and a main branch release more than 24 hours before the real green flag.
 - There is now basic plot queueing functionality in the GUI. By default, plotting works as it has in the past. However you can now name a queue in Step 2 Advanced Options. Chose something like `first`. Everything you add to the `first` queue will start up like it has in the past but now you can go through the steps again and create a queue named `second` and it will immediately start plotting as if it is unaware of and parallel with `first`. A great use case is that you would set `first` to plot 5 plots sequentially and then you'd set `second` to plot 5 sequentially and that would give you two parallel queues of 5 plot's each. We will be returning to plotting speed and UI soon. Thanks @jespino for this clever work around for now.
 - There is now an option on the Farm page to manage your farming rewards receive addresses. This makes it easy to send your farming rewards to an offline wallet. This also checks your existing rewards addresses and warns if you do not have the matching private key. That is expected if you are using an offline wallet of course.
 - Functionally has been added to the farmer rpc including checking and changing your farming rewards target addresses.
@@ -749,21 +749,21 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ## Fixed
 
-- The Farm page will now no longer get stuck at 50 TXCH farmed.
+- The Farm page will now no longer get stuck at 50 TGL farmed.
 - `chia farm` has had multiple bugs and spelling issues addressed. Thanks to @alfonsoperez, @soulmerge and @olivernyc for your contributions.
 - `chia wallet` had various bugs.
 - Various weight proof improvements.
 - Some users on Big Sur could not plot from the GUI as the log window would be stuck on "Loading."
 - We believe we have fixed the chain stall/confused Timelord bug from ~ 13:00 UTC 3/10/21. We've added additional recovery logic as well.
 - Logs from receiving a duplicate compacted Proof of Time are much more human friendly.
-- We believe that the install/migrate process was bringing forward bad farming rewards receive addresses. We have attempted to stop that by only migrating RC3 and newer configurations. You can make sure you are not effected by using the Manage Farming Rewards tool mentioned above or putting a known good wallet receive address in both `xch_target_address` sections of config.yaml.
+- We believe that the install/migrate process was bringing forward bad farming rewards receive addresses. We have attempted to stop that by only migrating RC3 and newer configurations. You can make sure you are not effected by using the Manage Farming Rewards tool mentioned above or putting a known good wallet receive address in both `gl_target_address` sections of config.yaml.
 - Wallet cached transactions incorrectly in some cases.
 
 ## 1.0rc5 aka Release Candidate 5 - 2021-03-04
 
 ### Added
 
-- The RC5 release is a new breaking change/hard fork blockchain. Plots and keys from previous chains will work fine on RC5 but balances of TXCH will not come forward.
+- The RC5 release is a new breaking change/hard fork blockchain. Plots and keys from previous chains will work fine on RC5 but balances of TGL will not come forward.
 - We now support a "green flag" chain launch process. A new version of the software will poll download.chia.net/notify/ for a signed json file that will be the genesis block of the chain for that version. This will allow unattended start at mainnet.
 - Bluebox Timelords are back. These are Timelords most anyone can run. They search through the historical chain and find large proofs of times and compact them down to their smallest representation. This significantly speeds up syncing for newly started nodes. Currently this is only supported on Linux and MacOS x86_64 but we will expand that. Any desktop or server of any age will be fast enough to be a useful Bluebox Timelord.
 - Thanks to @jespino there is now `chia farm summary`. You can now get almost exactly the same farming information on the CLI as the GUI.
@@ -814,7 +814,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- RC3 is a new chain to support the last major chialisp changes. TXCH from the RC1/2 chain do not come forward to this chain but plots and keys continue to work as usual.
+- RC3 is a new chain to support the last major chialisp changes. TGL from the RC1/2 chain do not come forward to this chain but plots and keys continue to work as usual.
 - We have lowered the transaction lock to the first 5000 blocks to facilitate testing. We also started this chain at a lower difficulty.
 - A new RPC api: /push_tx. Using this RPC, you can spend custom chialisp programs. You need to make a SpendBundle, which includes the puzzle reveal (chialisp), a solution (chialisp) and a signature.
 - You can now use the RPC apis to query the mempool.
@@ -835,7 +835,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - The application is now more aware of whether it is running a testnet or mainnet. This impacts wallet's display behavior and certain blockchain validation rules.
 - Interface improvements for `chia netspace`.
 - Now that aiosqlite included our upstream improvements we install version 0.17.0.
-- `silicoin init` only migrates release candidate directories. The versioned sub directories under `~/chia` will be going away before mainnet.
+- `gold init` only migrates release candidate directories. The versioned sub directories under `~/chia` will be going away before mainnet.
 
 ### Fixed
 
@@ -869,8 +869,8 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 - This is the first release in our release candidate series. There are still a few things that will change at the edges but the blockchain, clvm, and chialisp are in release form. We have one major change to chialisp/clvm that we have chosen to schedule for the next release as in this release we're breaking the way q/quote works. We also have one more revision to the VDF that will decrease the sizes of the proofs of time. We expect a few more releases in the release candidate series.
 - Installers will now be of the pattern ChiaSetup-0.2.1.exe. `0.2` is release candidate and the final `.1` is the first release candidate.
-- Use 'silicoin wallet get_transactions' in the command line to see your transactions.
-- 'silicoin wallet show' now shows your wallet's height.
+- Use 'gold wallet get_transactions' in the command line to see your transactions.
+- 'gold wallet show' now shows your wallet's height.
 - Last Attempted Proof is now above Latest Block Challenge on the Farm page of the GUI.
 - The GUI now detects duplicate plots and also only counts unique plots and unique plot size.
 - We have integrated with crowdin to make it easier to translate the GUI. Check out [Chia Blockchain GUI](https://crowdin.com/project/chia-blockchain) there.
@@ -885,7 +885,7 @@ validation was changed to allow blocks like these to be made. This will enable c
 - Sub blocks renamed to blocks, and blocks renamed to transaction blocks, everywhere. This effects the RPC, now
 all fields that referred to sub blocks are changed to blocks.
 - Base difficulty and weight have increased, so difficulty of "5" in the rc1 testnet will be equivalent to "21990232555520" in the previous testnet.
-- 'silicoin wallet send' now takes in TXCH or XCH as units instead of mojos.
+- 'gold wallet send' now takes in TGL or GL as units instead of mojos.
 - Transactions have been further sped up.
 - The blockchain database has more careful validation.
 - The GUI is now using bech32m.
@@ -900,21 +900,21 @@ all fields that referred to sub blocks are changed to blocks.
 
 ### Added
 
-- The Beta 27 chain is a hard fork. All TXCH from previous releases has been reset on this chain. Your keys and plots of k=32 or larger continue to work just fine on this new chain.
+- The Beta 27 chain is a hard fork. All TGL from previous releases has been reset on this chain. Your keys and plots of k=32 or larger continue to work just fine on this new chain.
 - We now use the rust version of clvm, clvm_rs, in preference to validate transactions. We have additionally published binary wheels or clvm_rs for all four platforms and all three supported python versions. The rust version is approximately 50 times faster than the python version used to validate on chain transactions in previous versions.
 - We have moved to compressed quadratic forms for VDFs. Using compressed representation of quadratic forms reduces their serialized size from 130 to 100 bytes (for forms with 1024-bit discriminant). This shrinks the size of VDF outputs and VDF proofs, and it's a breaking change as the compressed representation is not compatible with the older uncompressed (a, b) representation. Compressed forms are also used in calls to chiavdf and in timelord's communication with VDF clients. The form compression algorithm is based on ["Trustless Groups of Unknown Order with Hyperelliptic Curves"](https://eprint.iacr.org/2020/196) by Samuel Dobson, Steven D. Galbraith and Benjamin Smith.
 - Last Attempted Proof on the Farm tab of the GUI now shows hours:minutes:seconds instead of just hours:minutes. This makes it much easier to see that your farmer is responding to recent challenges at a glance.
 - You can now send and receive transactions with the command line. Try `chia wallet -h` to learn more. Also, `chia wallet` now requires a third argument of `show`, therefor you will use `chia wallet show` to see your wallet balance.
 - We have added the [Crowdin](https://crowdin.com/) translation platform to [chia blockchain gui](https://crowdin.com/project/chia-blockchain). We are still getting it fully set up, but helping to translate the GUI is going to be much easier.
 - Full Node > Connections in the GUI now shows the peak sub block height your connected peers believe they are at. A node syncing from you will not be at the true peak sub block height until it gets into sync.
-- `silicoin init -c [directory]` will create new TLS certificates signed by your CA located in `[directory]`. Use this feature to configure a new remote harvester. Type `silicoin init -h` to get instructions. Huge thanks to a very efficient @eFishCent for this quick and thorough pull request.
+- `gold init -c [directory]` will create new TLS certificates signed by your CA located in `[directory]`. Use this feature to configure a new remote harvester. Type `gold init -h` to get instructions. Huge thanks to a very efficient @eFishCent for this quick and thorough pull request.
 - We build both MacOS x86_64 and MacOS universal wheels for chiapos, chiavdf, blpsy, and chiabip158 in Python 3.9. The universal build allows M1 Macs to run these dependencies in ARM64 native mode.
 - On first run in the GUI (or when there are no plot directories) there is now an "Add Plot Directories" on the Farm tab also.
 
 ### Changed
 
 - We are moving away from the terms sub blocks and blocks in our new consensus. What used to be called sub blocks will now just be blocks. Some blocks are now also transaction blocks. This is simpler both in the code and to reason about. Not all the code or UI may have caught up yet.
-- This release has the final mainnet rewards schedule. During the first three years, each block winner will win 2 TXCH/XCH per block for a total of 9216 TXCH per day from 4608 challenges per day.
+- This release has the final mainnet rewards schedule. During the first three years, each block winner will win 2 TGL/GL per block for a total of 9216 TGL per day from 4608 challenges per day.
 - Smart transactions now use an announcement instead of 'coin consumed' or lock methods.
 - The GUI is now in a separate submodule repository from chia-blockchain, [chia-blockchain-gui](https://github.com/Chia-Network/chia-blockchain-gui). The installers and install scripts have been updated and it continues to follow the same install steps. Note that the GUI directory will now be `chia-blockchain-gui`. The workflow for this may be "touch and go" for people who use the git install methods over the short term.
 - Very large coin counts are now supported.
@@ -932,7 +932,7 @@ all fields that referred to sub blocks are changed to blocks.
 - The GUI was incorrectly reporting the time frame that the netspace estimate it displays utilizes. It is technically 312.5 minutes, on average, over the trailing 1000 sub blocks.
 - Coloured coins were not working in the new consensus.
 - Some Haswell processors do not have certain AVX extensions and therefor would not run.
-- The cli wallet, `chia wallet`, was incorrectly displaying TXCH balances as if they were Coloured Coins.
+- The cli wallet, `chia wallet`, was incorrectly displaying TGL balances as if they were Coloured Coins.
 - We addressed [CVE-2020-28477](https://nvd.nist.gov/vuln/detail/CVE-2020-28477) in the GUI.
 - We made changes to CI to hopefully not repeat our skipped releases from the previous release cycle.
 
@@ -947,7 +947,7 @@ all fields that referred to sub blocks are changed to blocks.
 
 ### Changed
 
-- Significant improvements have been made to how the full node handles the mempool. This generally cuts CPU usage of node by 2x or more. Part of this increase is that we have temporarily limited the size of transactions. If you want to test sending a transaction you should keep the value of your transaction below 20 TXCH as new consensus will cause you to use a lot of inputs. This will be returned to the expected level as soon as the integration of [clvm rust](https://github.com/Chia-Network/clvm_rs) is complete.
+- Significant improvements have been made to how the full node handles the mempool. This generally cuts CPU usage of node by 2x or more. Part of this increase is that we have temporarily limited the size of transactions. If you want to test sending a transaction you should keep the value of your transaction below 20 TGL as new consensus will cause you to use a lot of inputs. This will be returned to the expected level as soon as the integration of [clvm rust](https://github.com/Chia-Network/clvm_rs) is complete.
 - We have changed the way TLS between nodes and between chia services work. Each node now has two certificate authorities. One is a public, shared CA that signs the TLS certificates that every node uses to connect to other nodes on 8444 or 58444. You now also have a self generated private CA that must sign e.g. farmer and harvester's certificates. To run a remote harvester you need a new harvester key that is then signed by your private CA. We know this is not easy for remote harvester in this release but will address it quickly.
 - We have changed the way we compile the proof of space plotter and added one additional optimization. On many modern processors this will mean that using the plotter with the `-e` flag will be 2-3% faster than the Beta 17 plotter on the same CPU. We have found this to be very sensitive to different CPUs but are now confident that, at worst, the Beta 24 plotter with `-e` will be the same speed as Beta 17 if not slightly faster on the same hardware. Huge thanks to @xorinox for meticulously tracking down and testing this.
 - If a peer is not responsive during sync, node will disconnect it.
@@ -1085,14 +1085,14 @@ all fields that referred to sub blocks are changed to blocks.
 
 ### Added
 
-- Welcome to the new consensus. This release is an all but a full re-write of the blockchain in under 30 days. There is now only one tip of the blockchain but we went from two chains to three. Block times are now a little under a minute but there are a couple of sub blocks between each transaction block. A block is also itself a special kind of sub block and each sub block rewards the farmer who won it 1 TXCH. Sub blocks come, on average, about every 17 to 18 seconds.
-- Starting with this Beta, there are 4608 opportunities per day for a farmer to win 1 TXCH compared to Beta 18 where there were 288 opportunities per day for a farmer to win 16 TXCH.
+- Welcome to the new consensus. This release is an all but a full re-write of the blockchain in under 30 days. There is now only one tip of the blockchain but we went from two chains to three. Block times are now a little under a minute but there are a couple of sub blocks between each transaction block. A block is also itself a special kind of sub block and each sub block rewards the farmer who won it 1 TGL. Sub blocks come, on average, about every 17 to 18 seconds.
+- Starting with this Beta, there are 4608 opportunities per day for a farmer to win 1 TGL compared to Beta 18 where there were 288 opportunities per day for a farmer to win 16 TGL.
 - There is a lot more information and explanation of the new consensus algorithm in the New Consensus Working Document linked from [chia.net](https://chia.net/). Among the improvements this gives the Chia blockchain are a much higher security level against all attacks, more frequent transaction blocks that have less time variation between them and are then buried under confirmations (sub blocks also count towards re-org security) much more quickly.
-- New consensus means this is a very hard fork. All of your TXCH from Beta 17/18 will be gone. Your plots and keys will work just fine however. You will have to sync to the new chain.
+- New consensus means this is a very hard fork. All of your TGL from Beta 17/18 will be gone. Your plots and keys will work just fine however. You will have to sync to the new chain.
 - You now have to sync 16 times more "blocks" for every 5 minutes of historical time so syncing is slower than it was on the old chain. We're aware of this and will be speeding it up and addressing blockchain database growth in the nest couple of releases.
-- Prior to this Beta 19, we had block times that targeted 5 minutes and rewarded 16 TXCH to one farmer. Moving forward we have epoch times that target 10 minutes and reward 32 TXCH to 32 farmers about every 17-18 seconds over that period. This has subtle naming and UI impacts in various places.
+- Prior to this Beta 19, we had block times that targeted 5 minutes and rewarded 16 TGL to one farmer. Moving forward we have epoch times that target 10 minutes and reward 32 TGL to 32 farmers about every 17-18 seconds over that period. This has subtle naming and UI impacts in various places.
 - Total transaction throughput is still targeted at 2.1x Bitcoin's throughput per hour but you will get more confirmations on a transaction much faster. This release has the errata that it doesn't limit transaction block size correctly.
-- For testing purposes this chain is quickly halving block rewards. By the time you're reading this and using the chain, farmers and pools will be receiving less than 1 TXCH for each block won as if it were 15-20 years from now. Block rewards are given in two components, 7/8's to the pool key and 1/8 to the farmer. The farmer also receives any transaction fees from the block.
+- For testing purposes this chain is quickly halving block rewards. By the time you're reading this and using the chain, farmers and pools will be receiving less than 1 TGL for each block won as if it were 15-20 years from now. Block rewards are given in two components, 7/8's to the pool key and 1/8 to the farmer. The farmer also receives any transaction fees from the block.
 - You can now plot in parallel using the GUI. A known limitation is that you can't yet specify that you want 4 sets of two parallel plots. Each parallel plot added starts immediately parallel. We will continue to improve this.
 - The GUI now warns if you attempt to create a plot smaller than k=32.
 - Added Chinese language localization (zh-cn). A big thank you to @goomario for their pull request!
@@ -1106,7 +1106,7 @@ all fields that referred to sub blocks are changed to blocks.
 - The Plot tab on the GUI is now the Plots tab. It starts out with a much more friendly new user wizard and otherwise keeps all of your farming plots listed here. Use the "+ ADD A PLOT" button in the top right to plot your second or later plot.
 - The new plots page offers advanced plotting options in the various "Show Advanced Options" fold outs.
 - The plotter supports the new bitfield back propagation method and the old method from Beta 17. To choose the old method add a `-e` to the command line or choose "Disable bitfield plotting" in "Show Advanced Options" of the Plots tab. Bitfield back propagation writes about 13% less total writes and can be faster on some slower hard drive temp spaces. For now, SSD temp space will likely plot faster with bitfield back propagation disabled. We will be returning to speed enhancements to the plotter as we approach and pass our mainnet launch.
-- The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - on average - to win a block, and how much TXCH you've won so far. Harvester and Full Node connections have moved to Advanced Options.
+- The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - on average - to win a block, and how much TGL you've won so far. Harvester and Full Node connections have moved to Advanced Options.
 - Harvester and farmer will start when the GUI starts instead of waiting for key selection if there are already keys available. This means you will start farming on reboot if you have the Chia application set to launch on start.
 - Testnet is now running at the primary port of 58444. Update your routers appropriately. This opens 8444 for mainnet.
 - All networking code has been refactored and mostly moved to websockets.
@@ -1285,7 +1285,7 @@ all fields that referred to sub blocks are changed to blocks.
 - Coloured coins have been updated to simplify them, remove 'a', and stop using an 'auditor'.
 - clvm has been significantly changed to support the new coloured coins implementation.
 - Bumped cryptography to 3.1. Cryptography is now publishing ARM64 binary wheels to PyPi so Raspberry Pi installs should be even easier.
-- `silicoin init` now automatically discovers previous releases in each new release.
+- `gold init` now automatically discovers previous releases in each new release.
 
 ### Fixed
 
@@ -1431,7 +1431,7 @@ in Windows or
 
 - Minor changes have been made across the repositories to better support
 compiling on OpenBSD. HT @n1000.
-- Changed XCH units to TXCH units for testnet.
+- Changed GL units to TGL units for testnet.
 - A push to a branch will cancel all ci runs still running for that branch.
 - Ci's now cache pip and npm caches between runs.
 - Improve test speed with smaller discriminants, less blocks, less keys, and
@@ -1527,7 +1527,7 @@ relic. We will make a patch available for these systems shortly.
 - Windows and MacOS now have one click installers that then send users to a GUI on both platforms to farm or use their wallets. Windows is built on GitHub Actions and MacOS is also built on Azure Pipelines so as to build on Mojave.
 - You can see and control your farmer, harvester, and plotter from the GUI on Windows, MacOS, and Linux.
 - Create plots and see the plotting log from a GUI on Windows, MacOS, and Linux.
-- You can now create or import private keys with a 24 word mnemonic, both in the UI and 'silicoin keys' command line.
+- You can now create or import private keys with a 24 word mnemonic, both in the UI and 'gold keys' command line.
 - You can delete and change active keys from the GUI and cli.
 - We added a new keychain system that replaces keys.yaml, and migrates existing users from keys.yaml. It utilizes each OS's keychain for slightly more secure key storage.
 - We added a `chia keys` command line program, to see, add, and remove private keys.
@@ -1577,11 +1577,11 @@ relic. We will make a patch available for these systems shortly.
 
 ### Changed
 
-- `silicoin init` properly migrates from previous versions including the k>=32 workaround. Additionally, the farming target key is checked to make sure that it is the valid and correct public key format.
+- `gold init` properly migrates from previous versions including the k>=32 workaround. Additionally, the farming target key is checked to make sure that it is the valid and correct public key format.
 - We have implemented a workaround for the `chia start` issues some were having upon crash or reboot. We will be rebuilding start and stop to be robust across platforms.
 - This release re-includes `chia-start-harvester`.
 - Coloured coins now have a prefix to help identify them. When sending transactions, the new prefix is incompatible with older clients.
-- The user interface now refers to chia coins with their correct currency code of XCH.
+- The user interface now refers to chia coins with their correct currency code of GL.
 - The next release will now be in the dev branch instead of the e.g. beta-1.5. Additionally we are enforcing linear merge into dev and prefer rebase merges or partial squash merges of particularly chatty commit histories.
 - Building the sub reposities (chiapos, chiavdf, blslibrary) now requires CMake 3.14+.
 
@@ -1592,7 +1592,7 @@ relic. We will make a patch available for these systems shortly.
 
 ### Deprecated
 
-- We have made significant changes to the full node database to make it more reliable and quicker to restart. This requires re-syncing the current chain. If you use `silicoin init` then sync on first start will happen automatically. "\$CHIA_ROOT" users will need to delete `$CHIA_ROOT/db/*` before starting Beta 1.5. This also fixes the simulation issue in Beta 1.4 where tips could go "back in time."
+- We have made significant changes to the full node database to make it more reliable and quicker to restart. This requires re-syncing the current chain. If you use `gold init` then sync on first start will happen automatically. "\$GOLD_ROOT" users will need to delete `$GOLD_ROOT/db/*` before starting Beta 1.5. This also fixes the simulation issue in Beta 1.4 where tips could go "back in time."
 
 ### Known issues
 
@@ -1608,7 +1608,7 @@ relic. We will make a patch available for these systems shortly.
 - We made some speed improvements that positively affected all platforms while trying to increase plotting speed in Windows.
 - The graphical Full Node display now shows the expected finish times of each of the prospective chain tips.
 - Now you can run estimates of the total space currently farming the network. Try `chia netspace -d 12` to run an estimate over the last 12 blocks which is approximately 1 hour.
-- We’ve added TLS authentication for incoming farmer connections. TLS certs and keys are generated during silicoin init and only full nodes with your keys will be able to connect to your Farmer. Also, Harvester, Timelord, and Wallet will now not accept incoming connections which reduces the application attack surface.
+- We’ve added TLS authentication for incoming farmer connections. TLS certs and keys are generated during gold init and only full nodes with your keys will be able to connect to your Farmer. Also, Harvester, Timelord, and Wallet will now not accept incoming connections which reduces the application attack surface.
 - The node RPC has a new endpoint get_header_by_height which allows you to retrieve the block header from a block height. Try `chia show -bh 1000` to see the block header hash of block 1000. You can then look up the block details with `chia show -b f655e1a9f7f8c89a703e40d9ce82ae33508badaf7b37fa1a56cad27926b5e936` which will look up a block by it's header hash.
 - Our Windows binaries check the processor they are about to run on at runtime and choose the best processor optimizations for our [MPIR](http://mpir.org/) VDF dependency on Windows.
 - Most of the content of README.md and INSTALL.md have been moved to the [repository wiki](https://github.com/Chia-Network/chia-blockchain/wiki) and placed in [INSTALL](https://github.com/Chia-Network/chia-blockchain/wiki/INSTALL) and [Quick Start Guide](https://github.com/Chia-Network/chia-blockchain/wiki/Quick-Start-Guide)
@@ -1645,7 +1645,7 @@ relic. We will make a patch available for these systems shortly.
 - Windows, WSL 2, Linux and MacOS installation is significantly streamlined. There is a new Windows installer for the Wallet GUI (huge thanks to @dkackman).
 - All installs can now be from the source repository or just the binary dependencies on WSL 2, most modern Linuxes, and MacOS Catalina. Binary support is for both Python 3.7 and 3.8.
 - There is a new migration tool to move from Beta1 (or 2) to Beta3. It should move everything except your plots.
-- There is a new command `silicoin init` that will migrate files and generate your initial configuration. If you want to use the Wallet or farm, you will also have to `chia-generate-keys`. You can read step by step instructions for [upgrading from a previous beta release](https://github.com/Chia-Network/chia-blockchain/wiki/Updating-beta-software). If you've set `$CHIA_ROOT` you will have to make sure your existing configuration remains compatible manually.
+- There is a new command `gold init` that will migrate files and generate your initial configuration. If you want to use the Wallet or farm, you will also have to `chia-generate-keys`. You can read step by step instructions for [upgrading from a previous beta release](https://github.com/Chia-Network/chia-blockchain/wiki/Updating-beta-software). If you've set `$GOLD_ROOT` you will have to make sure your existing configuration remains compatible manually.
 - Wallet has improved paper wallet recovery support.
 - We now also support restoring old wallets with only the wallet_sk and wallet_target. Beta3's Wallet will re-sync from scratch.
 - We've made lots of little improvements that should speed up node syncing
@@ -1692,7 +1692,7 @@ relic. We will make a patch available for these systems shortly.
 
 - We have revamped the chia management command line. To start a farmer all you have to do is start the venv with `. ./activate` and then type `chia-start-farmer &`. The [README.md](https://github.com/Chia-Network/chia-blockchain/blob/main/README.md) has been updated to reflect the new commands.
 - We have moved all node to node communication to TLS 1.3 by default. For now, all TLS is unauthenticated but certain types of over the wire node to node communications will have the ability to authenticate both by certificate and by inter protocol signature. Encrypting over the wire by default stops casual snooping of transaction origination, light wallet to trusted node communication, and harvester-farmer-node communication for example. This leaves only the mempool and the chain itself open to casual observation by the public and the various entities around the world.
-- Configuration directories have been moved to a default location of HomeDirectory/.chia/release/config, plots/ db/, wallet/ etc. This can be overridden by `export CHIA_ROOT=~/.chia` for example which would then put the plots directory in `HomeDirectory/.chia/plots`.
+- Configuration directories have been moved to a default location of HomeDirectory/.chia/release/config, plots/ db/, wallet/ etc. This can be overridden by `export GOLD_ROOT=~/.gold` for example which would then put the plots directory in `HomeDirectory/.gold/plots`.
 - The libraries chia-pos, chia-fast-vdf, and chia-bip-158 have been moved to their own repositories: [chiapos](https://github.com/Chia-Network/chiapos), [chiavdf](https://github.com/Chia-Network/chiavdf), and [chaibip158](https://github.com/Chia-Network/chiabip158). They are brought in by chia-blockchain at install time. Our BLS signature library remains at [bls-signatures](https://github.com/Chia-Network/bls-signatures).
 - The install process now brings in chiapos, chiavdf, etc from Pypi where they are auto published via GitHub Actions ci using cibuildwheel. Check out `.github/workflows/build.yml` for build methods in each of the sub repositories.
 - `chia-regenerate-keys` has been renamed `chia-generate-keys`.

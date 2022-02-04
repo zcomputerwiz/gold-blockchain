@@ -1,4 +1,4 @@
-; The DID innerpuzzle is designed to sit inside the singleton layer and provide functionality related to being an identity.
+; The DID innerpuzzle is designed to gold inside the singleton layer and provide functionality related to being an identity.
 ; At the moment the two pieces of functionality are recovery and message creation.
 ; A DID's ID is it's Singleton ID
 ; Recovery is based around having a list of known other DIDs which can send messages approving you change the innerpuzzle of your DID singleton

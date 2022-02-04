@@ -1,9 +1,9 @@
-min_mainnet_k_size: 32
+min_mainnet_k_size: 31
 
 # Send a ping to all peers after ping_interval seconds
 ping_interval: 120
 self_hostname: &self_hostname "localhost"
-daemon_port: 56402
+daemon_port: 55500
 daemon_max_message_size: 50000000 # maximum size of RPC message in bytes
 inbound_rate_limit_percent: 100
 outbound_rate_limit_percent: 30
@@ -12,19 +12,25 @@ network_overrides: &network_overrides
   constants:
     mainnet:
       NETWORK_TYPE: 1
-      GENESIS_CHALLENGE: 13e4727ff2e80816fa9ba74381186f3fcf1364b0a2369e422d5f42eb3f144ae8
+      GENESIS_CHALLENGE: b1e8f9ee96413b512aeb7e4a07142427e3e7c5e1c8be2242ecdc1537b523eb30
       DIFFICULTY_STARTING: 7
       EPOCH_BLOCKS: 768
       SUB_SLOT_ITERS_STARTING: 33554432
     testnet:
       NETWORK_TYPE: 1
-      GENESIS_CHALLENGE: 23c88e36f79cac130d32dfdb74515dd01566bde1df2525a7bedf6be5f083a8ee
+      GENESIS_CHALLENGE: 004d5ce5d9f46a7bbfdc76b5750ac7875b5f9c582417dab1a2fcf4b3efc4c9af
       SUB_SLOT_ITERS_STARTING: 33554432
       EPOCH_BLOCKS: 768
       DIFFICULTY_STARTING: 7
+    testnet7:
+      NETWORK_TYPE: 1
+      GENESIS_CHALLENGE: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      SUB_SLOT_ITERS_STARTING: 33554432
+      EPOCH_BLOCKS: 768
+      DIFFICULTY_STARTING: 1
     devnet:
       NETWORK_TYPE: 1
-      GENESIS_CHALLENGE: 33963360f289c462089888ddce402042353174f395f93f12704074898c5f7284
+      GENESIS_CHALLENGE: 312a8236f87e1ddd09269d5ae4bab8c20b9b77e0fe64bbd317053b9efc64da91
       SUB_SLOT_ITERS_STARTING: 33554432
       EPOCH_BLOCKS: 768
       DIFFICULTY_STARTING: 1
@@ -33,14 +39,14 @@ network_overrides: &network_overrides
       NUMBER_ZERO_BITS_PLOT_FILTER: 5
   config:
     mainnet:
-      address_prefix: "sit"
-      default_full_node_port: 22222
+      address_prefix: "gl"
+      default_full_node_port: 14444
     testnet:
-      address_prefix: "tsit"
-      default_full_node_port: 22222
+      address_prefix: "tgl"
+      default_full_node_port: 54444
     devnet:
-      address_prefix: "tsit"
-      default_full_node_port: 12444
+      address_prefix: "dgl"
+      default_full_node_port: 54445
 
 selected_network: &selected_network "mainnet"
 ALERTS_URL: https://download.chia.net/notify/mainnet_alert.txt
@@ -66,7 +72,7 @@ daemon_ssl:
 logging: &logging
   log_stdout: False  # If True, outputs to stdout instead of a file
   log_filename: "log/debug.log"
-  log_level: "WARNING"  # Can be CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET
+  log_level: "INFO"  # Can be CRITICAL, ERROR, WARNING, INFO, DEBUG, NOTSET
   log_maxfilesrotation: 7 #  Max files in rotation. Default value 7 if the key is not set
   log_syslog: False  # If True, outputs to SysLog host and port specified
   log_syslog_host: "localhost"  # Send logging messages to a remote or local Unix syslog
@@ -74,14 +80,14 @@ logging: &logging
 
 harvester:
   # The harvester server (if run) will run on this port
-  port: 22448
+  port: 14448
   farmer_peer:
     host: *self_hostname
-    port: 22447
+    port: 14447
 
   # If True, starts an RPC server at the following port
   start_rpc_server: True
-  rpc_port: 22560
+  rpc_port: 14560
   num_threads: 30
   plots_refresh_parameter:
     interval_seconds: 120 # The interval in seconds to refresh the plot file manager
@@ -114,7 +120,7 @@ harvester:
 
 pool:
   # Replace this with a real puzzle hash
-  # sit_target_address: sit102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
+  # gl_target_address: tgl102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
   logging: *logging
   network_overrides: *network_overrides
   selected_network: *selected_network
@@ -122,23 +128,23 @@ pool:
 
 farmer:
   # The farmer server (if run) will run on this port
-  port: 22447
+  port: 14447
   # The farmer will attempt to connect to this full node and harvester
   full_node_peer:
     host: *self_hostname
-    port: 22222
+    port: 14444
   harvester_peer:
     host: *self_hostname
-    port: 22448
+    port: 14448
 
   pool_public_keys: []
 
   # Replace this with a real puzzle hash
-  # sit_target_address: sit102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
+  # gl_target_address: tgl102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
 
   # If True, starts an RPC server at the following port
   start_rpc_server: True
-  rpc_port: 22559
+  rpc_port: 14559
 
   # To send a share to a pool, a proof of space must have required_iters less than this number
   pool_share_threshold: 1000
@@ -156,7 +162,7 @@ farmer:
 timelord_launcher:
   # The server where the VDF clients will connect to.
   host: *self_hostname
-  port: 22000
+  port: 14000
   # Number of VDF client processes to keep alive in the local machine.
   process_count: 3
   logging: *logging
@@ -164,7 +170,7 @@ timelord_launcher:
 
 timelord:
   # The timelord server (if run) will run on this port
-  port: 22446
+  port: 14446
   # Provides a list of VDF clients expected to connect to this timelord.
   # For each client, an IP is provided, together with the estimated iterations per second.
   vdf_clients:
@@ -176,13 +182,13 @@ timelord:
       - 150000
   full_node_peer:
       host: *self_hostname
-      port: 22222
+      port: 14444
   # Maximum number of seconds allowed for a client to reconnect to the server.
   max_connection_time: 60
   # The ip and port where the TCP clients will connect.
   vdf_server:
     host: *self_hostname
-    port: 22000
+    port: 14000
   logging: *logging
   network_overrides: *network_overrides
   selected_network: *selected_network
@@ -211,7 +217,7 @@ timelord:
 
 full_node:
   # The full node server (if run) will run on this port
-  port: 22222
+  port: 14444
 
   # controls the sync-to-disk behavior of the database connection. Can be one of:
   # "on"    enables syncing to disk, minimizes risk of corrupting the DB in
@@ -233,7 +239,7 @@ full_node:
 
   # If True, starts an RPC server at the following port
   start_rpc_server: True
-  rpc_port: 22555
+  rpc_port: 14555
 
   # Use UPnP to attempt to allow other full nodes to reach your node behind a gateway
   enable_upnp: True
@@ -284,19 +290,19 @@ full_node:
   # List of trusted DNS seeders to bootstrap from.
   # If you modify this, please change the hardcode as well from FullNode.set_server()
   dns_servers:
-    - dns-introducer.sitnetwork.net
+    - dns-introducer.gold.cab
   farmer_peer:
       host: *self_hostname
-      port: 22447
+      port: 14447
   timelord_peer:
       host: *self_hostname
-      port: 22446
+      port: 14446
   introducer_peer:
-      host: introducer.sitnetwork.net
-      port: 21234
+      host: introducer.gold.cab
+      port: 14445
   wallet_peer:
     host: *self_hostname
-    port: 22449
+    port: 14449
   logging: *logging
   network_overrides: *network_overrides
   selected_network: *selected_network
@@ -309,10 +315,10 @@ full_node:
 
 ui:
    # The ui node server (if run) will run on this port
-  port: 22222
+  port: 14444
 
   # Which port to use to communicate with the full node
-  rpc_port: 22555
+  rpc_port: 14555
 
   # This SSH key is for the ui SSH server
   ssh_filename: config/ssh_host_key
@@ -323,14 +329,14 @@ ui:
   # this is where the electron UI will find its daemon
   # defaults to the one running locally with its private keys
   daemon_host: *self_hostname
-  daemon_port: 56402
+  daemon_port: 55500
   daemon_ssl:
     private_crt: config/ssl/daemon/private_daemon.crt
     private_key: config/ssl/daemon/private_daemon.key
 
 introducer:
   host: *self_hostname
-  port: 22445
+  port: 14445
   max_peers_to_send: 20
   # The introducer will only return peers who it has seen in the last
   # recent_peer_threshold seconds
@@ -344,8 +350,8 @@ introducer:
     public_key:  "config/ssl/full_node/public_full_node.key"
 
 wallet:
-  port: 22449
-  rpc_port: 22256
+  port: 14449
+  rpc_port: 14256
 
   enable_profiler: False
 
@@ -359,7 +365,7 @@ wallet:
 
   full_node_peer:
     host: *self_hostname
-    port: 22222
+    port: 14444
 
   # see description for full_node.db_sync
   db_sync: auto
@@ -379,8 +385,8 @@ wallet:
   recent_peer_threshold: 6000
 
   introducer_peer:
-    host: introducer.sitnetwork.net
-    port: 21234
+    host: introducer.gold.cab
+    port: 14445
 
   ssl:
     private_crt:  "config/ssl/wallet/private_wallet.crt"

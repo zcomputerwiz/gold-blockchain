@@ -5,10 +5,10 @@
 Write-Output "   ---"
 Write-Output "clean source"
 Write-Output "   ---"
-git clean -fdx
-Set-Location -Path ".\chia-blockchain-gui" -PassThru
-git clean -fdx
-Set-Location -Path "../" -PassThru
+#git clean -fdx
+#Set-Location -Path ".\chia-blockchain-gui" -PassThru
+#git clean -fdx
+#Set-Location -Path "../" -PassThru
 
 
 mkdir build_scripts\win_build
@@ -19,8 +19,8 @@ git status
 Write-Output "   ---"
 Write-Output "curl miniupnpc"
 Write-Output "   ---"
-Invoke-WebRequest -Uri "https://pypi.chia.net/simple/miniupnpc/miniupnpc-2.1-cp37-cp37m-win_amd64.whl" -OutFile "miniupnpc-2.1-cp37-cp37m-win_amd64.whl"
-Write-Output "Using win_amd64 python 3.7 wheel from https://github.com/miniupnp/miniupnp/pull/475 (2.2.0-RC1)"
+Invoke-WebRequest -Uri "https://pypi.chia.net/simple/miniupnpc/miniupnpc-2.2.2-cp39-cp39-win_amd64.whl" -OutFile "miniupnpc-2.2.2-cp39-cp39-win_amd64.whl"
+Write-Output "Using win_amd64 python 3.9 wheel from https://github.com/miniupnp/miniupnp/pull/475 (2.2.0-RC1)"
 If ($LastExitCode -gt 0){
     Throw "Failed to download miniupnpc!"
 }
@@ -59,19 +59,19 @@ Write-Output "pip install miniupnpc"
 Set-Location -Path ".\build_scripts" -PassThru
 pip install --no-index --find-links=.\win_build\ miniupnpc
 # Write-Output "pip install setproctitle"
-# pip install setproctitle==1.2.2
+pip install setproctitle==1.2.2
 
 Write-Output "pip install chia-blockchain"
 pip install --no-index --find-links=.\win_build\ chia-blockchain
 
 Write-Output "   ---"
-Write-Output "Use pyinstaller to create silicoin .exe's"
+Write-Output "Use pyinstaller to create gold .exe's"
 Write-Output "   ---"
 $SPEC_FILE = (python -c 'import chia; print(chia.PYINSTALLER_SPEC_PATH)') -join "`n"
 pyinstaller --log-level INFO $SPEC_FILE
 
 Write-Output "   ---"
-Write-Output "Copy silicoin executables to chia-blockchain-gui\"
+Write-Output "Copy gold executables to chia-blockchain-gui\"
 Write-Output "   ---"
 Copy-Item "dist\daemon" -Destination "..\chia-blockchain-gui\" -Recurse
 

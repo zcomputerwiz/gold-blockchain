@@ -19,7 +19,7 @@ testnet_kwargs = {
     "SIGNIFICANT_BITS": 8,  # The number of bits to look at in difficulty and min iters. The rest are zeroed
     "DISCRIMINANT_SIZE_BITS": 1024,  # Max is 1024 (based on ClassGroupElement int size)
     "NUMBER_ZERO_BITS_PLOT_FILTER": 9,  # H(plot signature of the challenge) must start with these many zeroes
-    "MIN_PLOT_SIZE": 32,  # 32 for mainnet
+    "MIN_PLOT_SIZE": 31,  # 31 for mainnet
     "MAX_PLOT_SIZE": 50,
     "SUB_SLOT_TIME_TARGET": 600,  # The target number of seconds per slot, mainnet 600
     "NUM_SP_INTERVALS_EXTRA": 3,  # The number of sp intervals to add to the signage point
@@ -32,10 +32,10 @@ testnet_kwargs = {
     # Forks of chia should change this value to provide replay attack protection. This is set to mainnet genesis chall
     "AGG_SIG_ME_ADDITIONAL_DATA": bytes.fromhex("ecbf4458b47e39c60afec66e245fccb042871417ffc5200cb0140346c2e044d0"),
     "GENESIS_PRE_FARM_POOL_PUZZLE_HASH": bytes.fromhex(
-        "d819c28786af76b7977b1f941d8f48e0d74bd6b89ccc4d1471b6be8430186c3a"
+        "1154e73194bc5479dd029fef922b2aa1a0cc1bbc383c756f5ff8040dadcac4bb"
     ),
     "GENESIS_PRE_FARM_FARMER_PUZZLE_HASH": bytes.fromhex(
-        "d819c28786af76b7977b1f941d8f48e0d74bd6b89ccc4d1471b6be8430186c3a"
+        "df62080c2648f32317da68a4dfa82b8ee09280278598366864475989d6a9a12e"
     ),
     "MAX_VDF_WITNESS_SIZE": 64,
     # Size of mempool = 50x the size of block # temporary change until #9125 gets in

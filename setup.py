@@ -97,15 +97,15 @@ kwargs = dict(
     ],
     entry_points={
         "console_scripts": [
-            "sit = chia.cmds.chia:main",
-            "sit_wallet = chia.server.start_wallet:main",
-            "sit_full_node = chia.server.start_full_node:main",
-            "sit_harvester = chia.server.start_harvester:main",
-            "sit_farmer = chia.server.start_farmer:main",
-            "sit_introducer = chia.server.start_introducer:main",
-            "sit_timelord = chia.server.start_timelord:main",
-            "sit_timelord_launcher = chia.timelord.timelord_launcher:main",
-            "sit_full_node_simulator = chia.simulator.start_simulator:main",
+            "gold = chia.cmds.chia:main",
+            "gold_wallet = chia.server.start_wallet:main",
+            "gold_full_node = chia.server.start_full_node:main",
+            "gold_harvester = chia.server.start_harvester:main",
+            "gold_farmer = chia.server.start_farmer:main",
+            "gold_introducer = chia.server.start_introducer:main",
+            "gold_timelord = chia.server.start_timelord:main",
+            "gold_timelord_launcher = chia.timelord.timelord_launcher:main",
+            "gold_full_node_simulator = chia.simulator.start_simulator:main",
         ]
     },
     package_data={

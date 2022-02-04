@@ -1,19 +1,19 @@
 from typing import Generator, KeysView
 
 SERVICES_FOR_GROUP = {
-    "all": "sit_harvester sit_timelord_launcher sit_timelord sit_farmer sit_full_node sit_wallet".split(),
-    "node": "sit_full_node".split(),
-    "harvester": "sit_harvester".split(),
-    "farmer": "sit_harvester sit_farmer sit_full_node sit_wallet".split(),
-    "farmer-no-wallet": "sit_harvester sit_farmer sit_full_node".split(),
-    "farmer-only": "sit_farmer".split(),
-    "timelord": "sit_timelord_launcher sit_timelord sit_full_node".split(),
-    "timelord-only": "sit_timelord".split(),
-    "timelord-launcher-only": "sit_timelord_launcher".split(),
-    "wallet": "sit_wallet sit_full_node".split(),
-    "wallet-only": "sit_wallet".split(),
-    "introducer": "sit_introducer".split(),
-    "simulator": "sit_full_node_simulator".split(),
+    "all": "gold_harvester gold_timelord_launcher gold_timelord gold_farmer gold_full_node gold_wallet".split(),
+    "node": "gold_full_node".split(),
+    "harvester": "gold_harvester".split(),
+    "farmer": "gold_harvester gold_farmer gold_full_node gold_wallet".split(),
+    "farmer-no-wallet": "gold_harvester gold_farmer gold_full_node".split(),
+    "farmer-only": "gold_farmer".split(),
+    "timelord": "gold_timelord_launcher gold_timelord gold_full_node".split(),
+    "timelord-only": "gold_timelord".split(),
+    "timelord-launcher-only": "gold_timelord_launcher".split(),
+    "wallet": "gold_wallet gold_full_node".split(),
+    "wallet-only": "gold_wallet".split(),
+    "introducer": "gold_introducer".split(),
+    "simulator": "gold_full_node_simulator".split(),
 }
 
 

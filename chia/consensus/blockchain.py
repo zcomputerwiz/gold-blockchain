@@ -1013,7 +1013,7 @@ class Blockchain(BlockchainInterface):
             if blocks == 0:
                 coeff = Decimal(1)
             else:
-                # multiple 1000 to keep same scale as sit
+                # multiple 1000 to keep same scale as gl
                 space = uint128(int(network_space * blocks / block_range))
 
                 if space == 0:

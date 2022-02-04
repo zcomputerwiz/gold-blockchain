@@ -88,7 +88,7 @@ def get_transactions_cmd(
     sys.stdout.close()
 
 
-@wallet_cmd.command("send", short_help="Send sit to another wallet")
+@wallet_cmd.command("send", short_help="Send gl to another wallet")
 @click.option(
     "-wp",
     "--wallet-rpc-port",
@@ -98,17 +98,17 @@ def get_transactions_cmd(
 )
 @click.option("-f", "--fingerprint", help="Set the fingerprint to specify which wallet to use", type=int)
 @click.option("-i", "--id", help="Id of the wallet to use", type=int, default=1, show_default=True, required=True)
-@click.option("-a", "--amount", help="How much sit to send, in XCH", type=str, required=True)
+@click.option("-a", "--amount", help="How much gl to send, in GL", type=str, required=True)
 @click.option(
     "-m",
     "--fee",
-    help="Set the fees for the transaction, in XCH",
+    help="Set the fees for the transaction, in GL",
     type=str,
     default="0",
     show_default=True,
     required=True,
 )
-@click.option("-t", "--address", help="Address to send the XCH", type=str, required=True)
+@click.option("-t", "--address", help="Address to send the GL", type=str, required=True)
 @click.option(
     "-o", "--override", help="Submits transaction without checking for unusual values", is_flag=True, default=False
 )
@@ -123,7 +123,7 @@ def send_cmd(
     asyncio.run(execute_with_wallet(wallet_rpc_port, fingerprint, extra_params, send))
 
 
-@wallet_cmd.command("send_from", short_help="Transfer all sit away from a specific puzzle hash")
+@wallet_cmd.command("send_from", short_help="Transfer all gl away from a specific puzzle hash")
 @click.option(
     "-p",
     "--rpc-port",
@@ -144,8 +144,8 @@ def send_cmd(
 )
 @click.option("-f", "--fingerprint", help="Set the fingerprint to specify which wallet to use", type=int)
 @click.option("-i", "--id", help="Id of the wallet to use", type=int, default=1, show_default=True, required=True)
-@click.option("-s", "--source", help="Address to send the XCH from", type=str, required=True)
-@click.option("-t", "--address", help="Address to send the XCH", type=str, required=True)
+@click.option("-s", "--source", help="Address to send the GL from", type=str, required=True)
+@click.option("-t", "--address", help="Address to send the GL", type=str, required=True)
 def send_from_cmd(
     rpc_port: Optional[int],
     wallet_rpc_port: Optional[int],
@@ -255,7 +255,7 @@ async def do_recover_pool_nft(contract_hash: str, launcher_hash: str, fingerprin
 )
 @click.option(
     "--launcher-hash",
-    help="Set the launcher hash, you should get it from silicoin wallet",
+    help="Set the launcher hash, you should get it from gold wallet",
     type=str,
     default=None,
 )

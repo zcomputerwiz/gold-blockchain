@@ -8,10 +8,10 @@ Set-Location -Path ".\chia-blockchain-gui" -PassThru
 Write-Output "   ---"
 Write-Output "Prepare Electron packager"
 Write-Output "   ---"
-npm install --save-dev electron-winstaller
-npm install -g electron-packager
-npm install
-npm audit fix
+#npm install --save-dev electron-winstaller
+#npm install -g electron-packager
+#npm install
+#npm audit fix
 
 Write-Output "   ---"
 Write-Output "Electron package Windows Installer"
@@ -22,12 +22,13 @@ If ($LastExitCode -gt 0){
 }
 
 Write-Output "   ---"
-Write-Output "Increase the stack for silicoin command for (silicoin plots create) chiapos limitations"
+Write-Output "Increase the stack for gold command for (gold plots create) chiapos limitations"
 # editbin.exe needs to be in the path
-editbin.exe /STACK:8000000 daemon\chia.exe
+$env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30037\bin\Hostx64\x64" 
+editbin.exe /STACK:8000000 daemon\gold.exe
 Write-Output "   ---"
 
-$appName = "SIT"
+$appName = "Gold"
 $packageVersion = $version
 $packageName = "$appName-$packageVersion"
 
@@ -40,7 +41,7 @@ Write-Output "   ---"
 
 Write-Output "   ---"
 Write-Output "node winstaller.js"
-node winstaller.js
+C:\"Program Files"\nodejs\node.exe winstaller.js
 
 
 

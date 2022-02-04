@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# git clone https://github.com/silicoin-network/silicoin-blockchain.git
-# cd silicoin-blockchain
+# git clone https://github.com/gold-network/gold-blockchain.git
+# cd gold-blockchain
 # git submodule update --init --recursive
 
 echo "clean source ========================="
 # git clean -fdx
-rm -rf ./build_scripts/build
-rm -rf ./build_scripts/dist
-cd chia-blockchain-gui
-git clean -fdx
-cd ../
+# rm -rf ./build_scripts/build
+# rm -rf ./build_scripts/dist
+# cd chia-blockchain-gui
+# git clean -fdx
+# cd ../
 
 echo "venv & install ========================="
 python3.7 -m venv venv
@@ -44,7 +44,7 @@ deactivate
 echo "cp daemon ========================="
 #daemon
 #cp -r dist/daemon ../chia-blockchain-gui
-rm -rf ../../sit-linux
-cp -r dist/daemon ../../sit-linux
+rm -rf ../../gold-linux
+cp -r dist/daemon ../../gold-linux
 cd ../
 

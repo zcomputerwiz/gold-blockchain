@@ -81,7 +81,7 @@ def prompt_to_save_passphrase() -> bool:
             print(
                 "\n"
                 "Your passphrase can be stored in your system's secure credential store. "
-                "Other Silicoin processes will be able to access your keys without prompting for your passphrase."
+                "Other Gold processes will be able to access your keys without prompting for your passphrase."
             )
             if warning is not None:
                 colorama.init()
@@ -126,7 +126,7 @@ def read_passphrase_from_file(passphrase_file: TextIOWrapper) -> str:
 def initialize_passphrase() -> None:
     if Keychain.has_master_passphrase():
         print("Keyring is already protected by a passphrase")
-        print("\nUse 'sit passphrase set' or 'sit passphrase remove' to update or remove your passphrase")
+        print("\nUse 'gold passphrase set' or 'gold passphrase remove' to update or remove your passphrase")
         sys.exit(1)
 
     # We'll rely on Keyring initialization to leverage the cached passphrase for

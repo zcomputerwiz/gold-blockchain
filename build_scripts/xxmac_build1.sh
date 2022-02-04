@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# git clone https://github.com/silicoin-network/silicoin-blockchain.git
-# cd silicoin-blockchain
+# git clone https://github.com/gold-network/gold-blockchain.git
+# cd gold-blockchain
 # git submodule update --init --recursive
 
 echo "clean source ========================="

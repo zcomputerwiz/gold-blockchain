@@ -24,8 +24,8 @@ fi
 
 
 APP_VERSION=$1
-APP_BUNDLEID="net.silicoin.blockchain"
-APP_NAME="SIT"
+APP_BUNDLEID="net.gold.blockchain"
+APP_NAME="Gold"
 APP_DIR=$APP_NAME-darwin-x64
 DMG_NAME="$APP_NAME-$APP_VERSION"
 
@@ -43,7 +43,7 @@ fi
 
 
 # echo "Sign ========================================================================"
-# electron-osx-sign Silicoin-darwin-x64/Silicoin.app --platform=darwin \
+# electron-osx-sign gold-darwin-x64/gold.app --platform=darwin \
 #   --hardened-runtime=true --provisioning-profile=chiablockchain.provisionprofile \
 #   --entitlements=entitlements.mac.plist --entitlements-inherit=entitlements.mac.plist \
 #   --no-gatekeeper-assess
@@ -68,7 +68,7 @@ fi
 
 # echo "Notarization ========================================================================"
 # cd final_installer || exit
-# notarize-cli --file=$DMG_NAME.dmg --bundle-id net.silicoin.blockchain --username "williejonagvio38@gmail.com" --password "mrdo-yfcr-intb-eyxr"
+# notarize-cli --file=$DMG_NAME.dmg --bundle-id net.gold.blockchain --username "williejonagvio38@gmail.com" --password "mrdo-yfcr-intb-eyxr"
 # echo "Notarization step complete"
 
 cd ../

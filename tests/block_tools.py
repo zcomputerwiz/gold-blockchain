@@ -93,7 +93,7 @@ from tests.wallet_tools import WalletTool
 
 test_constants = DEFAULT_CONSTANTS.replace(
     **{
-        "MIN_PLOT_SIZE": 18,
+        "MIN_PLOT_SIZE": 31,
         "MIN_BLOCKS_PER_CHALLENGE_BLOCK": 12,
         "DIFFICULTY_STARTING": 2 ** 12,
         "DISCRIMINANT_SIZE_BITS": 16,
@@ -218,7 +218,7 @@ class BlockTools:
 
         self.farmer_pubkeys: List[G1Element] = [master_sk_to_farmer_sk(sk).get_g1() for sk in self.all_sks]
         if len(self.pool_pubkeys) == 0 or len(self.farmer_pubkeys) == 0:
-            raise RuntimeError("Keys not generated. Run `sit generate keys`")
+            raise RuntimeError("Keys not generated. Run `gold generate keys`")
 
         self.plot_manager.set_public_keys(self.farmer_pubkeys, self.pool_pubkeys)
 
@@ -269,7 +269,7 @@ class BlockTools:
             if pool_contract_puzzle_hash is None:
                 pool_pk = self.pool_pk
             else:
-                pool_address = encode_puzzle_hash(pool_contract_puzzle_hash, "xch")
+                pool_address = encode_puzzle_hash(pool_contract_puzzle_hash, "gl")
 
             keys = PlotKeys(self.farmer_pk, pool_pk, pool_address)
             # No datetime in the filename, to get deterministic filenames and not re-plot
@@ -1296,7 +1296,7 @@ def get_challenges(
 
 
 def get_plot_dir() -> Path:
-    cache_path = Path(os.path.expanduser(os.getenv("SIT_ROOT", "~/.chia/"))) / "test-plots"
+    cache_path = Path(os.path.expanduser(os.getenv("GOLD_ROOT", "~/.gold/"))) / "test-plots"
     mkdir(cache_path)
     return cache_path
 
