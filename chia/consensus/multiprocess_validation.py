@@ -221,7 +221,7 @@ async def pre_validate_blocks_multiprocessing(
             constants.DIFFICULTY_CONSTANT_FACTOR,
             q_str,
             block.reward_chain_block.proof_of_space.size,
-            Decimal(difficulty * difficulty_coeff,)
+            Decimal(difficulty * difficulty_coeff),
             cc_sp_hash,
         )
 
