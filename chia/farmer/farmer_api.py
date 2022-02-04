@@ -105,7 +105,7 @@ class FarmerAPI:
             if required_iters < calculate_sp_interval_iters(self.farmer.constants, sp.sub_slot_iters):
                 if new_proof_of_space.sp_hash in self.farmer.stakings:
                     try:
-                        difficulty_coeff = stakings[bytes(new_proof_of_space.proof.farmer_public_key)]
+                        difficulty_coeff = self.farmer.stakings[bytes(new_proof_of_space.proof.farmer_public_key)]
                     except KeyError as e:
                         self.farmer.log.error(f"Error get staking for public key {new_proof_of_space.proof.farmer_public_key}, {e}")
                 else:
