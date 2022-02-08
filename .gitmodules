@@ -1,6 +1,6 @@
 [submodule "mozilla-ca"]
 	path = mozilla-ca
-	url = https://github.com/Chia-Network/mozilla-ca/
+	url = https://github.com/goldcoin-gl/gold-blockchain-gui/
 [submodule "chia-blockchain-gui"]
 	path = chia-blockchain-gui
 	url = https://github.com/goldcoin-gl/gold-blockchain-gui/
