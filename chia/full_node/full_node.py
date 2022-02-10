@@ -23,22 +23,17 @@ from chia.consensus.make_sub_epoch_summary import next_sub_epoch_summary
 from chia.consensus.multiprocess_validation import PreValidationResult
 from chia.consensus.pot_iterations import calculate_sp_iters
 from chia.full_node.block_store import BlockStore
-from chia.full_node.lock_queue import LockQueue, LockClient
 from chia.full_node.bundle_tools import detect_potential_template_generator
 from chia.full_node.coin_store import CoinStore
 from chia.full_node.full_node_store import FullNodeStore, FullNodeStorePeakResult
 from chia.full_node.hint_store import HintStore
+from chia.full_node.lock_queue import LockClient, LockQueue
 from chia.full_node.mempool_manager import MempoolManager
 from chia.full_node.signage_point import SignagePoint
 from chia.full_node.sync_store import SyncStore
 from chia.full_node.weight_proof import WeightProofHandler
 from chia.protocols import farmer_protocol, full_node_protocol, timelord_protocol, wallet_protocol
-from chia.protocols.full_node_protocol import (
-    RequestBlocks,
-    RespondBlock,
-    RespondBlocks,
-    RespondSignagePoint,
-)
+from chia.protocols.full_node_protocol import RequestBlocks, RespondBlock, RespondBlocks, RespondSignagePoint
 from chia.protocols.protocol_message_types import ProtocolMessageTypes
 from chia.protocols.wallet_protocol import CoinState, CoinStateUpdate
 from chia.server.node_discovery import FullNodePeers
@@ -62,14 +57,13 @@ from chia.util import cached_bls
 from chia.util.bech32m import encode_puzzle_hash
 from chia.util.check_fork_next_block import check_fork_next_block
 from chia.util.condition_tools import pkm_pairs
+from chia.util.db_synchronous import db_synchronous_on
 from chia.util.db_wrapper import DBWrapper
 from chia.util.errors import ConsensusError, Err, ValidationError
 from chia.util.ints import uint8, uint32, uint64, uint128
 from chia.util.path import mkdir, path_from_root
-from chia.util.safe_cancel_task import cancel_task_safe
 from chia.util.profiler import profile_task
-from datetime import datetime
-from chia.util.db_synchronous import db_synchronous_on
+from chia.util.safe_cancel_task import cancel_task_safe
 
 
 class FullNode:
@@ -283,9 +277,10 @@ class FullNode:
             default_port = None
         if "dns_servers" in self.config:
             dns_servers = self.config["dns_servers"]
-        # elif self.config["port"] == 8444:
+        elif self.config["port"] == 8444:
             # If `dns_servers` misses from the `config`, hardcode it if we're running mainnet.
             # dns_servers.append("dns-introducer.chia.net")
+            pass
         try:
             self.full_node_peers = FullNodePeers(
                 self.server,
@@ -364,30 +359,23 @@ class FullNode:
                 if not response:
                     raise ValueError(f"Error short batch syncing, invalid/no response for {height}-{end_height}")
                 async with self._blockchain_lock_high_priority:
-
-                    # for block in response.blocks:
-                    #     success, advanced_peak, fork_height, coin_changes = await self.receive_block_batch(
-                    #         [block], peer, None
-                    #     )
-                    #     if not success:
-                    #         raise ValueError(
-                    #             f"Error short batch syncing, failed to validate blocks {height}-{end_height}"
-                    #         )
-
-                    success, advanced_peak, fork_height, coin_changes = await self.receive_block_batch(
-                        response.blocks, peer, None
-                    )
-                    if not success:
-                        raise ValueError(f"Error short batch syncing, failed to validate blocks {height}-{end_height}")
-                    if advanced_peak:
-                        peak = self.blockchain.get_peak()
-                        try:
-                            peak_fb: Optional[FullBlock] = await self.blockchain.get_full_peak()
-                            assert peak is not None and peak_fb is not None and fork_height is not None
-                            mempool_new_peak_result, fns_peak_result = await self.peak_post_processing(
-                                peak_fb, peak, fork_height, peer, coin_changes[0]
+                    for block in response.blocks:
+                        success, advanced_peak, fork_height, coin_changes = await self.receive_block_batch(
+                            [block], peer, None
+                        )
+                        if not success:
+                            raise ValueError(
+                                f"Error short batch syncing, failed to validate blocks {height}-{end_height}"
                             )
-                            await self.peak_post_processing_2(
+                        if advanced_peak:
+                            peak = self.blockchain.get_peak()
+                            try:
+                                peak_fb: Optional[FullBlock] = await self.blockchain.get_full_peak()
+                                assert peak is not None and peak_fb is not None and fork_height is not None
+                                mempool_new_peak_result, fns_peak_result = await self.peak_post_processing(
+                                    peak_fb, peak, fork_height, peer, coin_changes[0]
+                                )
+                                await self.peak_post_processing_2(
                                     peak_fb,
                                     peak,
                                     fork_height,
@@ -396,14 +384,14 @@ class FullNode:
                                     mempool_new_peak_result,
                                     fns_peak_result,
                                 )
-                        except asyncio.CancelledError:
-                            # Still do post processing after cancel
-                            peak_fb = await self.blockchain.get_full_peak()
-                            assert peak is not None and peak_fb is not None and fork_height is not None
-                            await self.peak_post_processing(peak_fb, peak, fork_height, peer, coin_changes[0])
-                            raise
-                        finally:
-                            self.log.info(f"Added blocks {height}-{end_height}")
+                            except asyncio.CancelledError:
+                                # Still do post processing after cancel
+                                peak_fb = await self.blockchain.get_full_peak()
+                                assert peak is not None and peak_fb is not None and fork_height is not None
+                                await self.peak_post_processing(peak_fb, peak, fork_height, peer, coin_changes[0])
+                                raise
+                            finally:
+                                self.log.info(f"Added blocks {height}-{end_height}")
         except (asyncio.CancelledError, Exception) as e:
             self.sync_store.batch_syncing.remove(peer.peer_node_id)
             raise e
@@ -1026,7 +1014,6 @@ class FullNode:
 
         blocks_to_validate: List[FullBlock] = []
         for i, block in enumerate(all_blocks):
-            # if not self.blockchain.contains_block(block.header_hash):
             # If the block is not on current chain, re-validate
             if not self.blockchain.contains_block_in_peak_chain(block.header_hash):
                 blocks_to_validate = all_blocks[i:]
@@ -1695,7 +1682,7 @@ class FullNode:
                 f"Added unfinished_block {block_hash}, not farmed by us,"
                 f" SP: {block.reward_chain_block.signage_point_index} farmer response time: "
                 f"{receive_time - self.signage_point_times[block.reward_chain_block.signage_point_index]:0.4f}, "
-                f"Pool pk {encode_puzzle_hash(block.foliage.foliage_block_data.pool_target.puzzle_hash, 'gl')}, "
+                f"Pool pk {encode_puzzle_hash(block.foliage.foliage_block_data.pool_target.puzzle_hash, 'xch')}, "
                 f"validation time: {validation_time:0.4f} seconds, {pre_validation_log}"
                 f"cost: {block.transactions_info.cost if block.transactions_info else 'None'}"
                 f"{percent_full_str}"
@@ -1842,7 +1829,7 @@ class FullNode:
         try:
             await self.respond_block(full_node_protocol.RespondBlock(block))
         except Exception as e:
-            self.log.warning(f"Consensus error validating block: {e}")
+            self.log.exception(f"Consensus error validating block: {e}")
             if timelord_peer is not None:
                 # Only sends to the timelord who sent us this VDF, to reset them to the correct peak
                 await self.send_peak_to_timelords(peer=timelord_peer)
