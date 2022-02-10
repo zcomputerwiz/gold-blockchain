@@ -1,10 +1,9 @@
 import asyncio
 import time
-from decimal import Decimal
 from pathlib import Path
 from typing import Callable, List, Tuple
 
-from blspy import AugSchemeMPL, G1Element, G2Element
+from blspy import AugSchemeMPL, G2Element, G1Element
 
 from chia.consensus.pot_iterations import calculate_iterations_quality, calculate_sp_interval_iters
 from chia.harvester.harvester import Harvester
@@ -68,12 +67,10 @@ class HarvesterAPI:
         start = time.time()
         assert len(new_challenge.challenge_hash) == 32
 
-        stakings = {bytes(k): Decimal(v) for k, v in new_challenge.stakings}
-
         loop = asyncio.get_running_loop()
 
         def blocking_lookup(
-            filename: Path, plot_info: PlotInfo, difficulty_coeff: Decimal
+            filename: Path, plot_info: PlotInfo #, difficulty_coeff: Decimal
         ) -> List[Tuple[bytes32, ProofOfSpace]]:
             # Uses the DiskProver object to lookup qualities. This is a blocking call,
             # so it should be run in a thread pool.
@@ -113,8 +110,8 @@ class HarvesterAPI:
                             self.harvester.constants.DIFFICULTY_CONSTANT_FACTOR,
                             quality_str,
                             plot_info.prover.get_size(),
-                            difficulty,
-                            difficulty_coeff,
+                            difficulty * 0.5,
+                            # difficulty_coeff,
                             new_challenge.sp_hash,
                         )
                         sp_interval_iters = calculate_sp_interval_iters(self.harvester.constants, sub_slot_iters)
@@ -166,18 +163,18 @@ class HarvesterAPI:
             all_responses: List[harvester_protocol.NewProofOfSpace] = []
             if self.harvester._is_shutdown:
                 return filename, []
-
-            if stakings:
-                try:
-                    difficulty_coeff = stakings[bytes(plot_info.farmer_public_key)]
-                except KeyError as e:
-                    self.harvester.log.error(f"Error get staking for public key {plot_info.farmer_public_key}, {e}")
-                    return filename, []
-            else:
-                difficulty_coeff = Decimal(1)
+                
+            # if stakings:
+            #     try:
+            #         difficulty_coeff = stakings[bytes(plot_info.farmer_public_key)]
+            #     except KeyError as e:
+            #         self.harvester.log.error(f"Error get staking for public key {plot_info.farmer_public_key}, {e}")
+            #         return filename, []
+            # else:
+            #     difficulty_coeff = Decimal(1)
 
             proofs_of_space_and_q: List[Tuple[bytes32, ProofOfSpace]] = await loop.run_in_executor(
-                self.harvester.executor, blocking_lookup, filename, plot_info, difficulty_coeff
+                self.harvester.executor, blocking_lookup, filename, plot_info # , difficulty_coeff
             )
             for quality_str, proof_of_space in proofs_of_space_and_q:
                 all_responses.append(
@@ -187,7 +184,8 @@ class HarvesterAPI:
                         quality_str.hex() + str(filename.resolve()),
                         proof_of_space,
                         new_challenge.signage_point_index,
-                        str(difficulty_coeff),
+                        # str(difficulty_coeff),
+                        str(1),
                     )
                 )
             return filename, all_responses
