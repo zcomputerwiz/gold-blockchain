@@ -20,6 +20,8 @@ from chia.util.api_decorators import api_request, peer_required
 from chia.util.ints import uint8, uint32, uint64
 from chia.wallet.derive_keys import master_sk_to_local_sk
 
+from decimal import Decimal
+
 
 class HarvesterAPI:
     harvester: Harvester
