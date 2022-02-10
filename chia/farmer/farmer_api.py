@@ -1,5 +1,6 @@
 import json
 import time
+from decimal import Decimal
 from typing import Callable, Optional, List, Any, Dict, Tuple
 
 import aiohttp
@@ -10,7 +11,7 @@ from chia.consensus.network_type import NetworkType
 from chia.consensus.pot_iterations import calculate_iterations_quality, calculate_sp_interval_iters
 from chia.farmer.farmer import Farmer
 from chia.protocols import farmer_protocol, harvester_protocol
-from chia.protocols.harvester_protocol import PoolDifficulty
+from chia.protocols.harvester_protocol import NewProofOfSpace, PoolDifficulty
 from chia.protocols.pool_protocol import (
     get_current_authentication_token,
     PoolErrorCode,
@@ -23,6 +24,7 @@ from chia.server.server import ssl_context_for_root
 from chia.ssl.create_ssl import get_mozilla_ca_crt
 from chia.types.blockchain_format.pool_target import PoolTarget
 from chia.types.blockchain_format.proof_of_space import ProofOfSpace
+from chia.types.peer_info import PeerInfo
 from chia.util.api_decorators import api_request, peer_required
 from chia.util.ints import uint32, uint64
 
@@ -93,35 +95,74 @@ class FarmerAPI:
                 self.farmer.constants.DIFFICULTY_CONSTANT_FACTOR,
                 computed_quality_string,
                 new_proof_of_space.proof.size,
-                sp.difficulty,
-                # Decimal(new_proof_of_space.difficulty_coeff),
+                Decimal(int(sp.difficulty) * Decimal(new_proof_of_space.difficulty_coeff)),
                 new_proof_of_space.sp_hash,
             )
 
-            # If the iters are good enough to make a block, proceed with the block making flow
+            # The proof passes with the filter difficulty, now try the real thing
             passes_filter = False
+            difficulty_coeff = Decimal(new_proof_of_space.difficulty_coeff)
             if required_iters < calculate_sp_interval_iters(self.farmer.constants, sp.sub_slot_iters):
-                response: farmer_protocol.FarmerStakings = await peer.request_stakings(
-                    farmer_protocol.RequestStakings(public_keys=self.farmer.get_public_keys(), height=None, blocks=None)
-                )
-                if response is None or not isinstance(response, farmer_protocol.FarmerStakings):
-                    self.log.warning(f"bad RequestStakings response from peer {response}")
-                else:
+                if new_proof_of_space.sp_hash in self.farmer.stakings:
                     try:
-                        new_proof_of_space.difficulty_coeff =  response.stakings[bytes(new_proof_of_space.proof.farmer_public_key)]
-                        required_iters: uint64 = calculate_iterations_quality(
-                            self.farmer.constants.DIFFICULTY_CONSTANT_FACTOR,
-                            computed_quality_string,
-                            new_proof_of_space.proof.size,
-                            sp.difficulty * new_proof_of_space.difficulty_coeff,
-                            new_proof_of_space.sp_hash,
-                        )
-                        if required_iters < calculate_sp_interval_iters(self.farmer.constants, sp.sub_slot_iters):
-                            passes_filter = True
+                        difficulty_coeff = self.farmer.stakings[bytes(new_proof_of_space.proof.farmer_public_key)]
                     except KeyError as e:
-                        self.harvester.log.error(f"Error get staking for public key {new_proof_of_space.proof.farmer_public_key}, {e}")
+                        self.farmer.log.error(f"Error get staking for public key {new_proof_of_space.proof.farmer_public_key}, {e}")
+                else:
+                    full_node_peer_info = PeerInfo(
+                        self.farmer.config["full_node_peer"]["host"],
+                        self.farmer.config["full_node_peer"]["port"],
+                    )
+                    self.farmer.log.info(f"local full node info: {full_node_peer_info}")
+                    full_node_peer = None
+                    self.farmer.log.info(f"connected full nodes: {len(self.farmer.server.get_full_node_connections())}")
+                    for connection in self.farmer.server.get_full_node_connections():
+                        self.farmer.log.info(f"connected full node info: {connection.get_peer_info()}")
+                        full_node_peer = connection
+                        if connection.get_peer_info().host == full_node_peer_info.host:
+                            self.farmer.log.info(f"local full node peer connected: {full_node_peer.get_peer_info()}")
+                            break
+                        else:
+                            self.farmer.log.info(f"ignoring non local full node peer: {full_node_peer.get_peer_info()}")
 
+                    response : Optional[farmer_protocol.FarmerStakings] = await full_node_peer.request_stakings(
+                        farmer_protocol.RequestStakings(public_keys=self.farmer.get_public_keys(), height=None, blocks=None)
+                    )
+                    if response is None or not isinstance(response, farmer_protocol.FarmerStakings):
+                        self.farmer.log.warning(f"bad RequestStakings response from peer {response}")
+                    else:
+                        stakings = {bytes(k): Decimal(v) for k, v in response.stakings}
+                        if stakings:
+                            try:
+                                self.farmer.stakings[new_proof_of_space.sp_hash] = stakings
+                                difficulty_coeff = stakings[bytes(new_proof_of_space.proof.farmer_public_key)]
+                            except KeyError as e:
+                                self.farmer.log.error(f"Error get staking for public key {new_proof_of_space.proof.farmer_public_key}, {e}")
 
+                format_coeff = "{:.2f}".format(difficulty_coeff)
+                self.farmer.log.info(f"proof passed initial checks with farmer difficulty filter coefficient: {new_proof_of_space.difficulty_coeff}")
+                self.farmer.log.info(f"now testing with actual farmer difficulty coefficient: {format_coeff}")
+
+                new_proof_of_space = NewProofOfSpace(
+                        new_proof_of_space.challenge_hash,
+                        new_proof_of_space.sp_hash,
+                        new_proof_of_space.plot_identifier,
+                        new_proof_of_space.proof,
+                        new_proof_of_space.signage_point_index,
+                        difficulty_coeff
+                )
+                required_iters: uint64 = calculate_iterations_quality(
+                    self.farmer.constants.DIFFICULTY_CONSTANT_FACTOR,
+                    computed_quality_string,
+                    new_proof_of_space.proof.size,
+                    Decimal(int(sp.difficulty) * Decimal(new_proof_of_space.difficulty_coeff)),
+                    new_proof_of_space.sp_hash,
+                )
+                if required_iters < calculate_sp_interval_iters(self.farmer.constants, sp.sub_slot_iters):
+                    passes_filter = True
+                    self.farmer.log.info(f"proof is good enough to make a block!")
+
+            # If the iters are good enough to make a block, proceed with the block making flow
             if passes_filter:
                 # Proceed at getting the signatures for this PoSpace
                 request = harvester_protocol.RequestSignatures(
@@ -173,7 +214,7 @@ class FarmerAPI:
                     self.farmer.constants.DIFFICULTY_CONSTANT_FACTOR,
                     computed_quality_string,
                     new_proof_of_space.proof.size,
-                    pool_state_dict["current_difficulty"] * 1.5,  # FIXME handle staking in pool protocol
+                    Decimal(int(pool_state_dict["current_difficulty"]) * Decimal(1.5)),  # FIXME handle staking in pool protocol
                     new_proof_of_space.sp_hash,
                 )
                 if required_iters >= calculate_sp_interval_iters(

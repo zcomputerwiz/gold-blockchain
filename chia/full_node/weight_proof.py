@@ -1,5 +1,6 @@
 import asyncio
 import dataclasses
+from decimal import Decimal
 import logging
 import math
 import random
@@ -1273,7 +1274,7 @@ def _validate_pospace_recent_chain(
         constants.DIFFICULTY_CONSTANT_FACTOR,
         q_str,
         block.reward_chain_block.proof_of_space.size,
-        diff * 0.5,
+        Decimal(int(diff) * Decimal(0.5)),
         cc_sp_hash,
     )
     return required_iters
@@ -1320,7 +1321,7 @@ def __validate_pospace(
         constants.DIFFICULTY_CONSTANT_FACTOR,
         q_str,
         sub_slot_data.proof_of_space.size,
-        curr_diff * 0.5,
+        Decimal(int(curr_diff) * Decimal(0.5)),
         cc_sp_hash,
     )
 
