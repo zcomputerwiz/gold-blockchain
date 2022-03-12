@@ -94,20 +94,6 @@ class Farmer:
         consensus_constants: ConsensusConstants,
         local_keychain: Optional[Keychain] = None,
     ):
-        pool_info_update_interval = UPDATE_POOL_INFO_INTERVAL
-        pool_farmer_info_update_interval = UPDATE_POOL_FARMER_INFO_INTERVAL
-        harvester_cache_update_interval = UPDATE_HARVESTER_CACHE_INTERVAL
-
-        if "update_intervals" in self.config:
-            update_intervals = self.config["update_intervals"]
-
-            if "pool_info" in update_intervals:
-                pool_info_update_interval = update_intervals["pool_info"]
-            if "pool_farmer_info" in update_intervals:
-                pool_farmer_info_update_interval = update_intervals["pool_farmer_info"]
-            if "harvester_cache" in update_intervals:
-                harvester_cache_update_interval = update_intervals["harvester_cache"]
-
         self.keychain_proxy: Optional[KeychainProxy] = None
         self.local_keychain = local_keychain
         self._root_path = root_path
@@ -142,6 +128,20 @@ class Farmer:
         self.server: Any = None
         self.state_changed_callback: Optional[Callable] = None
         self.log = log
+
+        pool_info_update_interval = UPDATE_POOL_INFO_INTERVAL
+        pool_farmer_info_update_interval = UPDATE_POOL_FARMER_INFO_INTERVAL
+        harvester_cache_update_interval = UPDATE_HARVESTER_CACHE_INTERVAL
+
+        if "update_intervals" in self.config:
+            update_intervals = self.config["update_intervals"]
+
+            if "pool_info" in update_intervals:
+                pool_info_update_interval = update_intervals["pool_info"]
+            if "pool_farmer_info" in update_intervals:
+                pool_farmer_info_update_interval = update_intervals["pool_farmer_info"]
+            if "harvester_cache" in update_intervals:
+                harvester_cache_update_interval = update_intervals["harvester_cache"]
 
     async def ensure_keychain_proxy(self) -> KeychainProxy:
         if not self.keychain_proxy:
