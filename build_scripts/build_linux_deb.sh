@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APP_BUNDLEID="net.gold.blockchain"
-APP_NAME="Gold"
+APP_NAME="gold"
 
 if [ ! "$1" ]; then
   echo "This script requires either amd64 of arm64 as an argument"
@@ -63,6 +63,7 @@ fi
 cp package.json package.json.orig
 jq --arg VER "$CHIA_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
 
+# electron-packager . $APP_NAME --asar.unpack="**/daemon/**" --platform=linux \
 electron-packager . $APP_NAME --asar.unpack="**/daemon/**" --platform=linux \
 --icon=src/assets/img/Chia.icns --overwrite --app-bundle-id=$APP_BUNDLEID \
 --appVersion=$CHIA_INSTALLER_VERSION
